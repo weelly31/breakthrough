@@ -22,7 +22,7 @@ const activities = [
   },
   {
     icon: BookOpen,
-    title: 'Bible Study Groups',
+    title: 'Small Group Discussions',
     description: 'Deepen your faith through interactive group discussions and reflections on God\'s word with experienced mentors.',
   },
 ];
