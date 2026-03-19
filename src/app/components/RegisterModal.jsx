@@ -5,22 +5,39 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Sparkles, MapPin, CalendarDays } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
 const initialForm = {
-  full_name: '', phone: '', age: '', gender: '',
-  church: '', address: '', shirt_size: '',
+  full_name: '', preferred_name: '', phone: '', age: '', gender: '',
+  church: '', address: '',
   emergency_contact_name: '', emergency_contact_number: '', emergency_contact_relation: '',
 };
+
+function Field({ label, name, type = 'text', placeholder, value, onChange, error }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(name, e.target.value)}
+        placeholder={placeholder}
+        className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
+          error ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
+        }`}
+      />
+      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+    </div>
+  );
+}
 
 export default function RegisterModal({ isOpen, onClose }) {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (isOpen) { setForm(initialForm); setErrors({}); setDone(false); }
+    if (isOpen) { setForm(initialForm); setErrors({}); setSubmitError(''); setDone(false); }
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -31,10 +48,9 @@ export default function RegisterModal({ isOpen, onClose }) {
     const e = {};
     if (!form.full_name.trim()) e.full_name = 'Required';
     if (!form.phone.trim()) e.phone = 'Required';
-    if (!form.age || isNaN(form.age) || +form.age < 10 || +form.age > 35) e.age = 'Age must be 10–35';
+    if (!form.age || isNaN(form.age) || +form.age < 10 || +form.age > 65) e.age = 'Age must be 10-65';
     if (!form.gender) e.gender = 'Required';
     if (!form.church.trim()) e.church = 'Required';
-    if (!form.shirt_size) e.shirt_size = 'Required';
     if (!form.emergency_contact_name.trim()) e.emergency_contact_name = 'Required';
     if (!form.emergency_contact_number.trim()) e.emergency_contact_number = 'Required';
     if (!form.emergency_contact_relation.trim()) e.emergency_contact_relation = 'Required';
@@ -45,28 +61,28 @@ export default function RegisterModal({ isOpen, onClose }) {
   const submit = async () => {
     if (!validate()) return;
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 700));
-    setSubmitting(false);
-    setDone(true);
-    confetti({ particleCount: 160, spread: 90, origin: { y: 0.5 }, colors: ['#f59e0b', '#fbbf24', '#fde68a', '#fff'] });
+    setSubmitError('');
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, age: Number(form.age) }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || 'Failed to submit registration.');
+      }
+
+      setDone(true);
+      confetti({ particleCount: 160, spread: 90, origin: { y: 0.5 }, colors: ['#f59e0b', '#fbbf24', '#fde68a', '#fff'] });
+    } catch (err) {
+      setSubmitError(err?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
-
-  const Field = ({ label, name, type = 'text', placeholder }) => (
-    <div>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
-      <input
-        type={type}
-        value={form[name]}
-        onChange={e => set(name, e.target.value)}
-        placeholder={placeholder}
-        className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
-          errors[name] ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
-        }`}
-      />
-      {errors[name] && <p className="text-red-400 text-xs mt-1">{errors[name]}</p>}
-    </div>
-  );
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -120,17 +136,13 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <Sparkles size={36} className="text-amber-400" />
                   </motion.div>
                   <h3 className="text-2xl font-black text-white">You're Registered! 🎉</h3>
-                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.full_name}</span>! See you at camp!</p>
+                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.preferred_name.trim() || form.full_name}</span>! See you at camp!</p>
                   <div className="bg-white/5 rounded-2xl p-5 w-full text-left space-y-2 text-sm mt-2">
                     <div className="flex items-center gap-2 text-slate-400"><CalendarDays size={14} className="text-amber-400" /> May 1–3, 2026</div>
                     <div className="flex items-center gap-2 text-slate-400"><MapPin size={14} className="text-amber-400" /> Methodist Prayer Garden, Taytay, Rizal</div>
                     <div className="flex justify-between pt-2 border-t border-white/5">
                       <span className="text-slate-400">Registration Fee</span>
                       <span className="text-amber-400 font-bold">₱500</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">T-Shirt Size</span>
-                      <span className="text-white font-medium">{form.shirt_size}</span>
                     </div>
                   </div>
                   <button onClick={onClose} className="mt-2 bg-amber-500 hover:bg-amber-400 text-slate-900 px-8 py-3 rounded-full text-sm font-bold transition-all">
@@ -143,10 +155,11 @@ export default function RegisterModal({ isOpen, onClose }) {
                   <div>
                     <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Personal Info</p>
                     <div className="space-y-3">
-                      <Field label="Full Name" name="full_name" placeholder="Juan dela Cruz" />
-                      <Field label="Contact Number" name="phone" placeholder="+63 9XX XXX XXXX" />
+                      <Field label="Full Name" name="full_name" placeholder="Juan dela Cruz" value={form.full_name} onChange={set} error={errors.full_name} />
+                      <Field label="Nickname / Preferred Name" name="preferred_name" placeholder="What should we call you?" value={form.preferred_name} onChange={set} error={errors.preferred_name} />
+                      <Field label="Contact Number" name="phone" placeholder="+63 9XX XXX XXXX" value={form.phone} onChange={set} error={errors.phone} />
                       <div className="grid grid-cols-2 gap-3">
-                        <Field label="Age" name="age" type="number" placeholder="18" />
+                        <Field label="Age" name="age" type="number" placeholder="18" value={form.age} onChange={set} error={errors.age} />
                         <div>
                           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Gender</label>
                           <div className="flex gap-2">
@@ -169,22 +182,8 @@ export default function RegisterModal({ isOpen, onClose }) {
                   <div>
                     <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Church & Preferences</p>
                     <div className="space-y-3">
-                      <Field label="Home Church / Ministry" name="church" placeholder="e.g. Victory Taytay" />
-                      <Field label="Complete Address" name="address" placeholder="Brgy., City, Province" />
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">T-Shirt Size</label>
-                        <div className="flex flex-wrap gap-2">
-                          {SHIRT_SIZES.map(sz => (
-                            <button key={sz} type="button" onClick={() => set('shirt_size', sz)}
-                              className={`w-12 h-10 rounded-xl text-sm font-bold border transition-all ${
-                                form.shirt_size === sz ? 'bg-amber-500 border-amber-500 text-slate-900' : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/30'
-                              }`}>
-                              {sz}
-                            </button>
-                          ))}
-                        </div>
-                        {errors.shirt_size && <p className="text-red-400 text-xs mt-1">{errors.shirt_size}</p>}
-                      </div>
+                      <Field label="Home Church / Ministry" name="church" value={form.church} onChange={set} error={errors.church} />
+                      <Field label="Complete Address" name="address" placeholder="Brgy., City, Province" value={form.address} onChange={set} error={errors.address} />
                     </div>
                   </div>
 
@@ -192,10 +191,10 @@ export default function RegisterModal({ isOpen, onClose }) {
                   <div>
                     <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Emergency Contact</p>
                     <div className="space-y-3">
-                      <Field label="Name" name="emergency_contact_name" placeholder="Full name" />
+                      <Field label="Name" name="emergency_contact_name" placeholder="Full name" value={form.emergency_contact_name} onChange={set} error={errors.emergency_contact_name} />
                       <div className="grid grid-cols-2 gap-3">
-                        <Field label="Contact Number" name="emergency_contact_number" placeholder="+63 9XX XXX XXXX" />
-                        <Field label="Relationship" name="emergency_contact_relation" placeholder="e.g. Parent" />
+                        <Field label="Contact Number" name="emergency_contact_number" placeholder="+63 9XX XXX XXXX" value={form.emergency_contact_number} onChange={set} error={errors.emergency_contact_number} />
+                        <Field label="Relationship" name="emergency_contact_relation" placeholder="e.g. Parent" value={form.emergency_contact_relation} onChange={set} error={errors.emergency_contact_relation} />
                       </div>
                     </div>
                   </div>
@@ -206,7 +205,10 @@ export default function RegisterModal({ isOpen, onClose }) {
             {/* Footer */}
             {!done && (
               <div className="shrink-0 px-6 py-4 border-t border-white/5 flex items-center justify-between gap-4">
-                <p className="text-slate-500 text-xs">Fee: <span className="text-amber-400 font-bold">₱500</span></p>
+                <div>
+                  <p className="text-slate-500 text-xs">Fee: <span className="text-amber-400 font-bold">₱500</span></p>
+                  {submitError && <p className="text-red-400 text-xs mt-1">{submitError}</p>}
+                </div>
                 <button
                   onClick={submit}
                   disabled={submitting}

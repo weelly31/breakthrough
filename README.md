@@ -56,3 +56,19 @@ NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL=weellandrade31@gmail.com
 ```
 
 4. Restart the dev server after adding environment variables.
+
+## Registration Setup (MongoDB)
+
+The registration modal now submits to `POST /api/register` and saves data to MongoDB.
+
+1. Create or use a MongoDB database (MongoDB Atlas or local MongoDB).
+2. Add these variables to `.env.local`:
+
+```bash
+MONGODB_URI=your_mongodb_connection_string
+MONGODB_DB=breakthrough
+```
+
+3. Restart the dev server after updating environment variables.
+
+Saved records are inserted into the `registrations` collection.
