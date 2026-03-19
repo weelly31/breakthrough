@@ -24,7 +24,7 @@ export default function AboutSection({ aboutImage }) {
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img src="img/journey.jpg" alt="Youth Camp Fellowship" className="w-full h-[400px] md:h-[500px] object-cover" />
+              <img src={aboutImage} alt="Youth Camp Fellowship" className="w-full h-[400px] md:h-[500px] object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent" />
             </div>
             {/* Decorative accent */}

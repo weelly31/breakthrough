@@ -11,22 +11,22 @@ import Footer from './components/Footer';
 import RegisterModal from './components/RegisterModal';
 
 const IMAGES = {
-  hero: 'img/bg.png',
-  about: 'img/journey.jpg',
+  hero: '/img/bg.png',
+  about: '/img/journey.jpg',
   activities: [
-    'img/worship.jpg',
-    'img/teambuilding.jpg',
-    'img/campfire.jpg',
-    'img/fellowship.jpg',
+    '/img/worship.jpg',
+    '/img/teambuilding.jpg',
+    '/img/campfire.jpg',
+    '/img/fellowship.jpg',
   ],
   gallery: [
-    'img/gallery1.jpg',
-    'img/gallery2.jpg',
-    'img/gallery3.jpg',
-    'img/gallery4.jpg',
-    'img/gallery5.jpg',
-    'img/gallery7.jpg',
-    'img/gallery6.jpg',
+    '/img/gallery1.jpg',
+    '/img/gallery2.jpg',
+    '/img/gallery3.jpg',
+    '/img/gallery4.jpg',
+    '/img/gallery5.jpg',
+    '/img/gallery7.jpg',
+    '/img/gallery6.jpg',
   ],
 };
 
