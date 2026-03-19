@@ -1,4 +1,4 @@
-import clientPromise from '@/lib/mongodb';
+import getClientPromise from '@/lib/mongodb';
 
 const REQUIRED_FIELDS = [
   'full_name',
@@ -40,7 +40,7 @@ export async function POST(request) {
       created_at: new Date(),
     };
 
-    const client = await clientPromise;
+    const client = await getClientPromise();
     const db = client.db(process.env.MONGODB_DB || 'breakthrough');
     const result = await db.collection('registrations').insertOne(registration);
 
