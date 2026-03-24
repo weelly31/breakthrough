@@ -64,7 +64,7 @@ export default function ActivitiesSection({ images }) {
                     alt={activity.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-slate-900/20 to-transparent" />
                   <div className="absolute bottom-4 left-4">
                     <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500 text-white">
                       <Icon size={20} />

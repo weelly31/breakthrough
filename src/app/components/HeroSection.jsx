@@ -20,18 +20,18 @@ export default function HeroSection({ heroImage, onRegister }) {
   };
 
   return (
-    <section id="hero" className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative h-screen min-h-175 flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <img src={heroImage} alt="Youth Retreat Hero" className="w-full h-full object-cover" />
         {/* Multi-layer gradient for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/40 to-slate-900/95" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/40 via-transparent to-slate-900/40" />
+        <div className="absolute inset-0 bg-linear-to-b from-slate-900/80 via-slate-900/40 to-slate-900/95" />
+        <div className="absolute inset-0 bg-linear-to-r from-slate-900/40 via-transparent to-slate-900/40" />
       </div>
 
       {/* Ambient glow behind title */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[300px] bg-amber-500/10 rounded-full blur-[100px]" />
+        <div className="w-150 h-75 bg-amber-500/10 rounded-full blur-[100px]" />
       </div>
 
       {/* Floating particles */}
@@ -78,9 +78,9 @@ export default function HeroSection({ heroImage, onRegister }) {
           transition={{ duration: 0.8, delay: 0.35 }}
           className="flex items-center justify-center gap-4 mb-5"
         >
-          <span className="h-px w-16 md:w-28 bg-gradient-to-r from-transparent to-amber-400/60" />
+          <span className="h-px w-16 md:w-28 bg-linear-to-r from-transparent to-amber-400/60" />
           <span className="text-amber-400 text-lg">✦</span>
-          <span className="h-px w-16 md:w-28 bg-gradient-to-l from-transparent to-amber-400/60" />
+          <span className="h-px w-16 md:w-28 bg-linear-to-l from-transparent to-amber-400/60" />
         </motion.div>
 
         {/* Subtitle */}
