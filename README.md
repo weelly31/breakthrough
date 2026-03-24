@@ -49,10 +49,10 @@ The contact form sends messages via EmailJS.
 3. Add a `.env.local` file in the project root with:
 
 ```bash
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
-NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL=your_email@example.com
+EMAILJS_SERVICE_ID=your_service_id
+EMAILJS_TEMPLATE_ID=your_template_id
+EMAILJS_PUBLIC_KEY=your_public_key
+CONTACT_RECEIVER_EMAIL=your_email@example.com
 ```
 
 4. Restart the dev server after adding environment variables.
