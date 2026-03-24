@@ -48,12 +48,12 @@ export default function Navbar({ onRegister }) {
               {link.label}
             </button>
           ))}
-          <Link
-            href="/admin"
+          {/* <Link
+            href="/admin"S
             className="text-white/80 hover:text-amber-400 text-sm font-medium tracking-wide transition-colors duration-300"
           >
             Admin
-          </Link>
+          </Link> */}
           <button
             onClick={onRegister}
             className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-5 py-2 rounded-full text-sm font-semibold tracking-wide transition-all duration-300"
