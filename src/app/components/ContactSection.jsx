@@ -1,15 +1,10 @@
 "use client";
+"use client";
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, Phone } from 'lucide-react';
 import { toast } from 'sonner';
-import emailjs, { EmailJSResponseStatus } from '@emailjs/browser';
-
-const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-const CONTACT_RECEIVER_EMAIL = process.env.NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL;
 
 export default function ContactSection({ onRegister }) {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -22,55 +17,30 @@ export default function ContactSection({ onRegister }) {
       return;
     }
 
-    const isEmailValid = /\S+@\S+\.\S+/.test(form.email);
-    if (!isEmailValid) {
+    if (!/\S+@\S+\.\S+/.test(form.email)) {
       toast.error('Please enter a valid email address.');
-      return;
-    }
-
-    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-      toast.error('Email is not configured yet. Please set EmailJS environment variables.');
       return;
     }
 
     setSending(true);
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_email: form.email,
-          message: form.message,
-          to_email: CONTACT_RECEIVER_EMAIL,
-          reply_to: form.email,
-        },
-        EMAILJS_PUBLIC_KEY,
-      );
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-      setForm({ name: '', email: '', message: '' });
-      toast.success('Message sent! We\'ll get back to you soon.');
-    } catch (error) {
-      const status = error?.status;
-      const text = error?.text;
+      const data = await res.json().catch(() => ({}));
 
-      if (status === 412 && text?.includes('Invalid grant')) {
-        toast.error('Email service needs reconnection. Please reconnect Gmail in EmailJS first.');
-        console.error('EmailJS send failed:', error);
+      if (!res.ok) {
+        toast.error(data?.error || 'Failed to send message. Please try again.');
         return;
       }
 
-      if (error instanceof EmailJSResponseStatus) {
-        const details = text ? ` ${text}` : '';
-        toast.error(`Failed to send message (${status}).${details}`);
-      } else if (status || text) {
-        const prefix = status ? `(${status}) ` : '';
-        toast.error(`Failed to send message ${prefix}${text || ''}`.trim());
-      } else {
-        toast.error('Failed to send message. Please try again.');
-      }
-
-      console.error('EmailJS send failed:', error);
+      setForm({ name: '', email: '', message: '' });
+      toast.success("Message sent! We'll get back to you soon.");
+    } catch {
+      toast.error('Failed to send message. Please try again.');
     } finally {
       setSending(false);
     }
