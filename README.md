@@ -52,7 +52,7 @@ The contact form sends messages via EmailJS.
 NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
 NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
 NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
-NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL=weellandrade31@gmail.com
+NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL=your_email@example.com
 ```
 
 4. Restart the dev server after adding environment variables.
