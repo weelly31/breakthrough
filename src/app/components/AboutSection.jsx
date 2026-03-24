@@ -2,12 +2,24 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Users, Flame } from 'lucide-react';
+import { Heart, Users, Flame, Backpack, CheckCircle2 } from 'lucide-react';
+
+const whatToBring = [
+  'Own beddings (Blanket, banig, or sleeping bag)',
+  'Personal hygiene kit',
+  'Extra clothes',
+  'Bible, notebook, and pen',
+];
+
+const whoCanJoin = [
+  'All youth and young professionals — whether your faith is on fire, growing, or just starting, this retreat is for you',
+  'Anyone ready to experience breakthrough, grow closer to God, and be inspired',
+];
 
 const highlights = [
-  { icon: Heart, title: 'Faith', desc: 'Deepen your relationship with Christ through worship and reflection.' },
-  { icon: Users, title: 'Fellowship', desc: 'Build lifelong friendships with fellow young believers.' },
-  { icon: Flame, title: 'Adventure', desc: 'Experience thrilling activities and unforgettable memories.' },
+  { icon: Heart, title: 'Encounter', desc: 'A personal encounter with God where walls fall, fears break, and faith rises.' },
+  { icon: Users, title: 'Community', desc: 'Connect with fellow youth and young professionals of The Living Saviour Christian Fellowship.' },
+  { icon: Flame, title: 'Purpose', desc: 'Step into His purpose and walk in renewed faith, strength, and freedom.' },
 ];
 
 export default function AboutSection({ aboutImage }) {
@@ -24,7 +36,7 @@ export default function AboutSection({ aboutImage }) {
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img src={aboutImage} alt="Youth Camp Fellowship" className="w-full h-[400px] md:h-[500px] object-cover" />
+              <img src={aboutImage} alt="Youth Retreat Fellowship" className="w-full h-[400px] md:h-[500px] object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 to-transparent" />
             </div>
             {/* Decorative accent */}
@@ -39,19 +51,15 @@ export default function AboutSection({ aboutImage }) {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-amber-600 tracking-[0.2em] uppercase text-sm font-semibold mb-3">Welcome, Campers!</p>
+            <p className="text-amber-600 tracking-[0.2em] uppercase text-sm font-semibold mb-3">About the Retreat</p>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight mb-6">
-              An Unforgettable Journey Awaits
+              Let Faith Arise
             </h2>
             <p className="text-slate-600 text-lg leading-relaxed mb-8">
-              Get ready for Youth Camp 2026 this May! Together, let's embark on a journey of faith, 
-              friendship, and adventure. May this experience strengthen our hearts, deepen our connection 
-              with Christ, and bring us lasting joy as we grow in His love. We can't wait to see you there!
+              Feeling on fire, or feeling distant from God? This Youth Retreat 2026 is for you! A powerful encounter where walls fall, fears break, and faith rises. Come ready to experience breakthrough, deepen your walk with God, and step into His purpose.
             </p>
             <p className="text-slate-500 leading-relaxed mb-10">
-             This 3-day camp is created to lead young people into a powerful breakthrough — overcoming struggles, breaking chains, 
-             and stepping into the life God has called them to live. Through inspiring messages, passionate worship, and 
-             meaningful fellowship, you will leave renewed, strengthened, and ready to walk in faith and freedom.
+              The Living Saviour Christian Fellowship invites all our youth and young professionals to join this first-ever retreat. Whether your faith is on fire, growing, or just starting — your breakthrough starts here. Let your faith arise!
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6">
@@ -67,6 +75,56 @@ export default function AboutSection({ aboutImage }) {
             </div>
           </motion.div>
         </div>
+
+        {/* What to Bring & Who Can Join */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="mt-20 grid md:grid-cols-2 gap-8"
+        >
+          {/* What to Bring */}
+          <div className="bg-amber-50 rounded-2xl p-8 border border-amber-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Backpack size={20} className="text-amber-600" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">What to Bring</h3>
+            </div>
+            <ul className="space-y-3">
+              {whatToBring.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-slate-600 text-sm leading-relaxed">
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 block" />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Who Can Join */}
+          <div className="bg-slate-900 rounded-2xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <CheckCircle2 size={20} className="text-amber-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Who Can Join?</h3>
+            </div>
+            <ul className="space-y-4">
+              {whoCanJoin.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-slate-300 text-sm leading-relaxed">
+                  <CheckCircle2 size={16} className="text-amber-400 mt-0.5 shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-amber-400 text-sm font-semibold italic">
+              Your breakthrough starts here. Let your faith arise!
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -15,9 +15,9 @@ export default function Footer({ onRegister }) {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <p className="text-white font-bold text-lg tracking-wider">
-              YOUTH CAMP <span className="text-amber-400">2026</span>
+              YOUTH RETREAT <span className="text-amber-400">2026</span>
             </p>
-            <p className="text-slate-500 text-sm mt-1">Breakthrough · Colossians 1:17-18</p>
+            <p className="text-slate-500 text-sm mt-1">Breakthrough · Joshua 6:20</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">

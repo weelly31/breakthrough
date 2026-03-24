@@ -99,7 +99,7 @@ export default function ContactSection({ onRegister }) {
             onClick={onRegister}
             className="bg-amber-500 hover:bg-amber-400 text-slate-900 px-8 py-4 rounded-full font-bold text-sm tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25"
           >
-            Register for Camp →
+            Register for Retreat →
           </button>
         </motion.div>
 
@@ -112,7 +112,7 @@ export default function ContactSection({ onRegister }) {
             className="lg:col-span-2 space-y-8"
           >
             <div>
-              <h3 className="text-xl font-bold text-white mb-6">Camp Details</h3>
+              <h3 className="text-xl font-bold text-white mb-6">Retreat Details</h3>
               <div className="space-y-5">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
@@ -120,7 +120,7 @@ export default function ContactSection({ onRegister }) {
                   </div>
                   <div>
                     <p className="text-white font-medium">Venue</p>
-                    <p className="text-slate-400 text-sm">Methodist Prayer Garden & Conference Site, Tikling, Taytay, Rizal</p>
+                    <p className="text-slate-400 text-sm">Guronasyon Foundation Inc. National High School, Bilibiran, Binangonan, Rizal</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">

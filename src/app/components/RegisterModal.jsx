@@ -33,11 +33,10 @@ export default function RegisterModal({ isOpen, onClose }) {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (isOpen) { setForm(initialForm); setErrors({}); setSubmitError(''); setDone(false); }
+    if (isOpen) { setForm(initialForm); setErrors({}); setDone(false); }
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -58,30 +57,15 @@ export default function RegisterModal({ isOpen, onClose }) {
     return Object.keys(e).length === 0;
   };
 
-  const submit = async () => {
+  const submit = () => {
     if (!validate()) return;
     setSubmitting(true);
-    setSubmitError('');
-
-    try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, age: Number(form.age) }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        throw new Error(data?.error || 'Failed to submit registration.');
-      }
-
+    // TODO: Connect to database when ready
+    setTimeout(() => {
+      setSubmitting(false);
       setDone(true);
       confetti({ particleCount: 160, spread: 90, origin: { y: 0.5 }, colors: ['#f59e0b', '#fbbf24', '#fde68a', '#fff'] });
-    } catch (err) {
-      setSubmitError(err?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
+    }, 800);
   };
   return (
     <AnimatePresence>
@@ -112,7 +96,7 @@ export default function RegisterModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0 border-b border-white/5">
               <div>
-                <p className="text-amber-400 text-xs tracking-[0.25em] uppercase font-bold">Youth Camp 2026</p>
+                <p className="text-amber-400 text-xs tracking-[0.25em] uppercase font-bold">Youth Retreat 2026</p>
                 <h2 className="text-white text-xl font-black leading-tight">Register Now</h2>
               </div>
               <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">
@@ -136,10 +120,10 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <Sparkles size={36} className="text-amber-400" />
                   </motion.div>
                   <h3 className="text-2xl font-black text-white">You're Registered! 🎉</h3>
-                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.preferred_name.trim() || form.full_name}</span>! See you at camp!</p>
+                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.preferred_name.trim() || form.full_name}</span>! See you at the retreat!</p>
                   <div className="bg-white/5 rounded-2xl p-5 w-full text-left space-y-2 text-sm mt-2">
-                    <div className="flex items-center gap-2 text-slate-400"><CalendarDays size={14} className="text-amber-400" /> May 1–3, 2026</div>
-                    <div className="flex items-center gap-2 text-slate-400"><MapPin size={14} className="text-amber-400" /> Methodist Prayer Garden, Taytay, Rizal</div>
+                    <div className="flex items-center gap-2 text-slate-400"><CalendarDays size={14} className="text-amber-400" /> April 30 – May 2, 2026</div>
+                    <div className="flex items-center gap-2 text-slate-400"><MapPin size={14} className="text-amber-400" /> Guronasyon Foundation Inc. NHS, Bilibiran, Binangonan, Rizal</div>
                     <div className="flex justify-between pt-2 border-t border-white/5">
                       <span className="text-slate-400">Registration Fee</span>
                       <span className="text-amber-400 font-bold">₱500</span>
@@ -207,7 +191,6 @@ export default function RegisterModal({ isOpen, onClose }) {
               <div className="shrink-0 px-6 py-4 border-t border-white/5 flex items-center justify-between gap-4">
                 <div>
                   <p className="text-slate-500 text-xs">Fee: <span className="text-amber-400 font-bold">₱500</span></p>
-                  {submitError && <p className="text-red-400 text-xs mt-1">{submitError}</p>}
                 </div>
                 <button
                   onClick={submit}

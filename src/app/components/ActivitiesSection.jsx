@@ -7,23 +7,23 @@ import { Music, Users, Flame, BookOpen } from 'lucide-react';
 const activities = [
   {
     icon: Music,
-    title: 'Worship Sessions',
-    description: 'Experience the presence of God through heartfelt music, prayer, and deep reflection. Let your spirit soar as we praise together.',
+    title: 'Powerful Worship',
+    description: 'Experience life-changing worship and messages that stir your spirit and draw you into the presence of God.',
   },
   {
     icon: Users,
-    title: 'Team Building Games',
-    description: 'Engage in exciting games designed to build trust, strengthen friendships, and promote teamwork among campers.',
+    title: 'Small Group Sessions',
+    description: 'Deep and honest small group discussions where you can be real, grow in faith, and build meaningful connections.',
   },
   {
     icon: Flame,
-    title: 'Campfire Nights',
-    description: 'Gather around the fire for stories, songs, and unforgettable moments under the stars with your camp family.',
+    title: 'Fun Activities',
+    description: 'Enjoy engaging activities and games designed to create lasting memories and strengthen bonds among participants.',
   },
   {
     icon: BookOpen,
-    title: 'Small Group Discussions',
-    description: 'Deepen your faith through interactive group discussions and reflections on God\'s word with experienced mentors.',
+    title: 'Personal Encounter with God',
+    description: 'Experience a renewed and stronger faith as you step into a personal breakthrough and walk in God\'s purpose for your life.',
   },
 ];
 
@@ -38,10 +38,10 @@ export default function ActivitiesSection({ images }) {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
-          <p className="text-amber-600 tracking-[0.2em] uppercase text-sm font-semibold mb-3">What We Do</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Camp Activities</h2>
+          <p className="text-amber-600 tracking-[0.2em] uppercase text-sm font-semibold mb-3">What to Expect</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Retreat Activities</h2>
           <p className="text-slate-500 text-lg">
-            From high-energy games to soul-stirring worship, every moment at camp is designed to draw you closer to God and each other.
+            From heartfelt worship to honest small group sessions, every moment at the retreat is designed to bring you closer to God and to each other.
           </p>
         </motion.div>
 
