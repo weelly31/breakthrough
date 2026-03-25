@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Contact Form Email Setup (EmailJS)
 
-The contact form sends messages via EmailJS.
+The contact form sends messages via EmailJS from the browser using `@emailjs/browser`.
 
 1. Create an EmailJS account and add an email service.
 2. Create an email template and include these variables in the template body:
@@ -49,13 +49,14 @@ The contact form sends messages via EmailJS.
 3. Add a `.env.local` file in the project root with:
 
 ```bash
-EMAILJS_SERVICE_ID=your_service_id
-EMAILJS_TEMPLATE_ID=your_template_id
-EMAILJS_PUBLIC_KEY=your_public_key
-CONTACT_RECEIVER_EMAIL=your_email@example.com
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL=your_email@example.com
 ```
 
 4. Restart the dev server after adding environment variables.
+5. Do not call EmailJS from a Next.js route handler unless you explicitly enable non-browser API access in your EmailJS account security settings.
 
 ## Registration Setup (MongoDB)
 

@@ -1,10 +1,15 @@
 "use client";
-"use client";
 
+import emailjs from '@emailjs/browser';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, Phone } from 'lucide-react';
 import { toast } from 'sonner';
+
+const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+const toEmail = process.env.NEXT_PUBLIC_CONTACT_RECEIVER_EMAIL;
 
 export default function ContactSection({ onRegister }) {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -22,24 +27,30 @@ export default function ContactSection({ onRegister }) {
       return;
     }
 
+    if (!serviceId || !templateId || !publicKey || !toEmail) {
+      toast.error('Contact form is not configured yet.');
+      return;
+    }
+
     setSending(true);
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        toast.error(data?.error || 'Failed to send message. Please try again.');
-        return;
-      }
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+          to_email: toEmail,
+          reply_to: form.email,
+        },
+        { publicKey }
+      );
 
       setForm({ name: '', email: '', message: '' });
       toast.success("Message sent! We'll get back to you soon.");
-    } catch {
+    } catch (error) {
+      console.error('EmailJS error:', error);
       toast.error('Failed to send message. Please try again.');
     } finally {
       setSending(false);
@@ -63,7 +74,7 @@ export default function ContactSection({ onRegister }) {
           <p className="text-amber-400 tracking-[0.2em] uppercase text-sm font-semibold mb-3">Get In Touch</p>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact & Register</h2>
           <p className="text-slate-400 text-lg mb-6">
-            Have questions? Reach out and we'll help you get started on this amazing journey.
+            Have questions? Reach out and we&apos;ll help you get started on this amazing journey.
           </p>
           <button
             onClick={onRegister}
