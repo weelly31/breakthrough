@@ -18,7 +18,7 @@ const whoCanJoin = [
 
 const highlights = [
   { icon: Heart, title: 'Encounter', desc: 'A personal encounter with God where walls fall, fears break, and faith rises.' },
-  { icon: Users, title: 'Community', desc: 'Connect with fellow youth and young professionals of The Living Saviour Christian Fellowship.' },
+  { icon: Users, title: 'Community', desc: 'Connect with fellow youth and young professionals of The Living Saviour Christian Fellowship and other churches' },
   { icon: Flame, title: 'Purpose', desc: 'Step into His purpose and walk in renewed faith, strength, and freedom.' },
 ];
 

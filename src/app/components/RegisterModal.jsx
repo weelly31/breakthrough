@@ -106,7 +106,7 @@ export default function RegisterModal({ isOpen, onClose }) {
     if (form.phone.trim() && !normalizePhilippineMobile(form.phone)) {
       e.phone = 'Use PH mobile format: 09XXXXXXXXX, +639XXXXXXXXX, or 639XXXXXXXXX';
     }
-    if (!form.age || isNaN(form.age) || +form.age < 10 || +form.age > 65) e.age = 'Age must be 10-65';
+    if (!form.age || isNaN(form.age) || +form.age < 12 || +form.age > 35) e.age = 'Age must be 12-35';
     if (!form.gender) e.gender = 'Required';
     if (!form.church.trim()) e.church = 'Required';
     if (!form.emergency_contact_name.trim()) e.emergency_contact_name = 'Required';

@@ -15,7 +15,7 @@ const IMAGES = {
   about: '/img/journey.jpg',
   activities: [
     '/img/worship.jpg',
-    '/img/teambuilding.jpg',
+    '/img/activities.jpg',
     '/img/campfire.jpg',
     '/img/fellowship.jpg',
   ],
