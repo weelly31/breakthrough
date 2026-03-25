@@ -98,7 +98,7 @@ export default function HeroSection({ heroImage, onRegister }) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.55 }}
-          className="text-white/50 text-sm md:text-base italic mb-10 text-center"
+          className="text-white/80 text-sm md:text-base italic mb-10 text-center"
         >
           &ldquo;When the trumpets sounded&hellip; the wall collapsed.&rdquo; &ndash; Joshua 6:20
         </motion.p>
