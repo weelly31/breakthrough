@@ -12,11 +12,6 @@ const activities = [
   },
   {
     icon: Users,
-    title: 'Small Group Sessions',
-    description: 'Deep and honest small group discussions where you can be real, grow in faith, and build meaningful connections.',
-  },
-  {
-    icon: Flame,
     title: 'Fun Activities',
     description: 'Enjoy engaging activities and games designed to create lasting memories and strengthen bonds among participants.',
   },
@@ -24,6 +19,11 @@ const activities = [
     icon: BookOpen,
     title: 'Personal Encounter with God',
     description: 'Experience a renewed and stronger faith as you step into a personal breakthrough and walk in God\'s purpose for your life.',
+  },
+  {
+    icon: Users,
+    title: 'Small Group Sessions',
+    description: 'Deep and honest small group discussions where you can be real, grow in faith, and build meaningful connections.',
   },
 ];
 
