@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Download, RefreshCcw, Search, ShieldCheck, X } from 'lucide-react';
+import { Download, Eye, EyeOff, RefreshCcw, Search, ShieldCheck, X } from 'lucide-react';
 import ExcelJS from 'exceljs';
 
 function getExcelColumns() {
@@ -21,16 +21,20 @@ function getExcelColumns() {
   ];
 }
 
+const PAGE_SIZE = 10;
+
 export default function AdminPage() {
   const [token, setToken] = useState('');
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
   const [churchFilter, setChurchFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const formattedRecords = useMemo(
     () => records.map((item) => ({ ...item, _createdDisplay: new Date(item.created_at).toLocaleString() })),
@@ -86,6 +90,26 @@ export default function AdminPage() {
       return searchableText.includes(normalizedQuery);
     });
   }, [formattedRecords, searchQuery, genderFilter, churchFilter]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredRecords.length / PAGE_SIZE)),
+    [filteredRecords.length],
+  );
+
+  const paginatedRecords = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    return filteredRecords.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredRecords, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [records, searchQuery, genderFilter, churchFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const loadRegistrations = async () => {
     setLoading(true);
@@ -226,13 +250,23 @@ export default function AdminPage() {
           </div>
 
           <div className="flex flex-col md:flex-row gap-3">
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="Enter password"
-              className="w-full md:max-w-md bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 outline-none focus:border-amber-400"
-            />
+            <div className="w-full md:max-w-md flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Enter password"
+                className="w-full bg-transparent py-3 text-white placeholder:text-slate-500 outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="inline-flex items-center justify-center text-slate-300 hover:text-amber-300"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
             <button
               onClick={loadRegistrations}
               disabled={loading || !token.trim()}
@@ -243,7 +277,7 @@ export default function AdminPage() {
             </button>
             <button
               onClick={exportExcel}
-              disabled={!records.length}
+              disabled={!filteredRecords.length}
               className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-amber-300 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl font-semibold text-sm"
             >
               <Download size={15} />
@@ -334,37 +368,61 @@ export default function AdminPage() {
           )}
 
           {!!filteredRecords.length && (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="bg-white/5 text-slate-300">
-                  <tr>
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Name</th>
-                    <th className="text-left px-4 py-3">Preferred</th>
-                    <th className="text-left px-4 py-3">Phone</th>
-                    <th className="text-left px-4 py-3">Age</th>
-                    <th className="text-left px-4 py-3">Gender</th>
-                    <th className="text-left px-4 py-3">Church</th>
-                    <th className="text-left px-4 py-3">Emergency Contact</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRecords.map((record) => (
-                    <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
-                      <td className="px-4 py-3 text-white whitespace-nowrap">{record.full_name}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.preferred_name || '-'}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.church}</td>
-                      <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
-                        {record.emergency_contact_name} ({record.emergency_contact_relation}) - {record.emergency_contact_number}
-                      </td>
+            <div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-white/5 text-slate-300">
+                    <tr>
+                      <th className="text-left px-4 py-3">Date</th>
+                      <th className="text-left px-4 py-3">Name</th>
+                      <th className="text-left px-4 py-3">Preferred</th>
+                      <th className="text-left px-4 py-3">Phone</th>
+                      <th className="text-left px-4 py-3">Age</th>
+                      <th className="text-left px-4 py-3">Gender</th>
+                      <th className="text-left px-4 py-3">Church</th>
+                      <th className="text-left px-4 py-3">Emergency Contact</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedRecords.map((record) => (
+                      <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors">
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
+                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.full_name}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.preferred_name || '-'}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.church}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                          {record.emergency_contact_name} ({record.emergency_contact_relation}) - {record.emergency_contact_number}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="px-5 md:px-6 py-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-sm">
+                <p className="text-slate-400">
+                  Page {currentPage} of {totalPages} • {PAGE_SIZE} per page
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg border border-white/20 hover:border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg border border-white/20 hover:border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </section>
