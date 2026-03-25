@@ -14,7 +14,9 @@ function getExcelColumns() {
     { header: 'Age', key: 'age', width: 10 },
     { header: 'Gender', key: 'gender', width: 14 },
     { header: 'Church', key: 'church', width: 28 },
-    { header: 'Address', key: 'address', width: 35 },
+    { header: 'Small Group Leader', key: 'small_group_leader', width: 26 },
+    { header: 'Other Church', key: 'other_church', width: 30 },
+    { header: 'Christian Duration', key: 'christian_duration', width: 22 },
     { header: 'Emergency Contact Name', key: 'emergency_contact_name', width: 26 },
     { header: 'Emergency Contact Number', key: 'emergency_contact_number', width: 24 },
     { header: 'Relationship', key: 'emergency_contact_relation', width: 16 },
@@ -33,7 +35,7 @@ export default function AdminPage() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
-  const [churchFilter, setChurchFilter] = useState('');
+  const [sgLeaderFilter, setSgLeaderFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const formattedRecords = useMemo(
@@ -48,28 +50,28 @@ export default function AdminPage() {
         .filter(Boolean),
     ));
 
-    const churches = Array.from(new Set(
+    const sgLeaders = Array.from(new Set(
       records
-        .map((item) => String(item.church || '').trim())
+        .map((item) => String(item.small_group_leader || '').trim())
         .filter(Boolean),
     ));
 
     return {
       genders: genders.sort((a, b) => a.localeCompare(b)),
-      churches: churches.sort((a, b) => a.localeCompare(b)),
+      sgLeaders: sgLeaders.sort((a, b) => a.localeCompare(b)),
     };
   }, [records]);
 
   const filteredRecords = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
-    const normalizedChurch = churchFilter.trim().toLowerCase();
+    const normalizedSgLeader = sgLeaderFilter.trim().toLowerCase();
 
     return formattedRecords.filter((record) => {
       if (genderFilter !== 'all' && String(record.gender || '').toLowerCase() !== genderFilter.toLowerCase()) {
         return false;
       }
 
-      if (normalizedChurch && String(record.church || '').toLowerCase() !== normalizedChurch) {
+      if (normalizedSgLeader && String(record.small_group_leader || '').toLowerCase() !== normalizedSgLeader) {
         return false;
       }
 
@@ -81,6 +83,9 @@ export default function AdminPage() {
         record.phone,
         record.gender,
         record.church,
+        record.small_group_leader,
+        record.other_church,
+        record.christian_duration,
         record.emergency_contact_name,
         record.emergency_contact_number,
       ]
@@ -89,7 +94,7 @@ export default function AdminPage() {
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [formattedRecords, searchQuery, genderFilter, churchFilter]);
+  }, [formattedRecords, searchQuery, genderFilter, sgLeaderFilter]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(filteredRecords.length / PAGE_SIZE)),
@@ -103,7 +108,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [records, searchQuery, genderFilter, churchFilter]);
+  }, [records, searchQuery, genderFilter, sgLeaderFilter]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -146,7 +151,7 @@ export default function AdminPage() {
     setSearchInput('');
     setSearchQuery('');
     setGenderFilter('all');
-    setChurchFilter('');
+    setSgLeaderFilter('');
   };
 
   const exportExcel = async () => {
@@ -182,7 +187,9 @@ export default function AdminPage() {
         age: record.age ?? '',
         gender: record.gender || '',
         church: record.church || '',
-        address: record.address || '',
+        small_group_leader: record.small_group_leader || '',
+        other_church: record.other_church || '',
+        christian_duration: record.christian_duration || '',
         emergency_contact_name: record.emergency_contact_name || '',
         emergency_contact_number: record.emergency_contact_number || '',
         emergency_contact_relation: record.emergency_contact_relation || '',
@@ -305,7 +312,7 @@ export default function AdminPage() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSearch();
                     }}
-                    placeholder="Search name, phone, church, emergency contact..."
+                    placeholder="Search name, phone, church, SG leader, emergency contact..."
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-amber-400"
                   />
                   <button
@@ -333,14 +340,14 @@ export default function AdminPage() {
 
                 <div className="lg:col-span-3 flex gap-2">
                   <select
-                    value={churchFilter}
-                    onChange={(e) => setChurchFilter(e.target.value)}
+                    value={sgLeaderFilter}
+                    onChange={(e) => setSgLeaderFilter(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
                   >
-                    <option value="" className="text-slate-900">All Churches</option>
-                    {filterOptions.churches.map((church) => (
-                      <option key={church} value={church} className="text-slate-900">
-                        {church}
+                    <option value="" className="text-slate-900">All SG Leaders</option>
+                    {filterOptions.sgLeaders.map((leader) => (
+                      <option key={leader} value={leader} className="text-slate-900">
+                        {leader}
                       </option>
                     ))}
                   </select>
@@ -380,6 +387,8 @@ export default function AdminPage() {
                       <th className="text-left px-4 py-3">Age</th>
                       <th className="text-left px-4 py-3">Gender</th>
                       <th className="text-left px-4 py-3">Church</th>
+                      <th className="text-left px-4 py-3">SG Leader</th>
+                      <th className="text-left px-4 py-3">Christian Duration</th>
                       <th className="text-left px-4 py-3">Emergency Contact</th>
                     </tr>
                   </thead>
@@ -392,7 +401,12 @@ export default function AdminPage() {
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.church}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.church || '-'}</td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                          {record.small_group_leader}
+                          {record.small_group_leader === 'FROM OTHER CHURCH' && record.other_church ? ` (${record.other_church})` : ''}
+                        </td>
+                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.christian_duration || '-'}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
                           {record.emergency_contact_name} ({record.emergency_contact_relation}) - {record.emergency_contact_number}
                         </td>

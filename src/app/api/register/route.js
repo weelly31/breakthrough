@@ -7,6 +7,8 @@ const REQUIRED_FIELDS = [
   'age',
   'gender',
   'church',
+  'small_group_leader',
+  'christian_duration',
   'emergency_contact_name',
   'emergency_contact_number',
   'emergency_contact_relation',
@@ -116,6 +118,13 @@ export async function POST(request) {
 
     const normalizedPhone = normalizePhilippineMobile(body.phone);
     const normalizedEmergencyPhone = normalizePhilippineMobile(body.emergency_contact_number);
+    const smallGroupLeader = toUpperTrimmed(body.small_group_leader);
+    const christianDuration = toUpperTrimmed(body.christian_duration);
+    const otherChurch = toUpperTrimmed(body.other_church ?? '');
+
+    if (smallGroupLeader === 'FROM OTHER CHURCH' && !otherChurch) {
+      return Response.json({ error: 'other_church is required when selecting FROM OTHER CHURCH.' }, { status: 400 });
+    }
 
     if (!normalizedPhone) {
       return Response.json(
@@ -152,7 +161,9 @@ export async function POST(request) {
       age,
       gender: toUpperTrimmed(body.gender),
       church: toUpperTrimmed(body.church),
-      address: toUpperTrimmed(body.address ?? ''),
+      small_group_leader: smallGroupLeader,
+      other_church: otherChurch,
+      christian_duration: christianDuration,
       emergency_contact_name: emergencyContactName,
       emergency_contact_number: normalizedEmergencyPhone,
       emergency_contact_relation: toUpperTrimmed(body.emergency_contact_relation),

@@ -5,9 +5,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Sparkles, MapPin, CalendarDays } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+const SG_LEADER_OPTIONS = [
+  'PTR. ALLEN',
+  'KIM',
+  'KEVIN',
+  'JOYCE',
+  'MJ',
+  'JZ',
+  'ROUIE',
+  'IAN',
+  'SHEELAH',
+  'LUIZ',
+  'BEA',
+  'MARIE JOYCE',
+  'NO SG LEADER YET',
+  'FROM OTHER CHURCH',
+];
+
+const CHRISTIAN_DURATION_OPTIONS = [
+  '0 - 1 YEAR',
+  '2 - 5 YEARS',
+  '6 - 10 YEARS',
+  '10 YEARS ABOVE',
+];
+
 const initialForm = {
   full_name: '', preferred_name: '', phone: '', age: '', gender: '',
-  church: '', address: '',
+  church: '', small_group_leader: '', other_church: '', christian_duration: '',
   emergency_contact_name: '', emergency_contact_number: '', emergency_contact_relation: '',
 };
 
@@ -15,7 +39,7 @@ const UPPERCASE_FIELDS = new Set([
   'full_name',
   'preferred_name',
   'church',
-  'address',
+  'other_church',
   'emergency_contact_name',
   'emergency_contact_relation',
 ]);
@@ -86,6 +110,14 @@ export default function RegisterModal({ isOpen, onClose }) {
       nextValue = String(nextValue ?? '').toUpperCase();
     }
 
+    if (field === 'small_group_leader' && val !== 'FROM OTHER CHURCH') {
+      return {
+        ...f,
+        small_group_leader: val,
+        other_church: '',
+      };
+    }
+
     return {
       ...f,
       [field]: nextValue,
@@ -109,6 +141,11 @@ export default function RegisterModal({ isOpen, onClose }) {
     if (!form.age || isNaN(form.age) || +form.age < 12 || +form.age > 35) e.age = 'Age must be 12-35';
     if (!form.gender) e.gender = 'Required';
     if (!form.church.trim()) e.church = 'Required';
+    if (!form.small_group_leader) e.small_group_leader = 'Required';
+    if (form.small_group_leader === 'FROM OTHER CHURCH' && !form.other_church.trim()) {
+      e.other_church = 'Please specify your church';
+    }
+    if (!form.christian_duration) e.christian_duration = 'Required';
     if (!form.emergency_contact_name.trim()) e.emergency_contact_name = 'Required';
     if (form.emergency_contact_name.trim() && !isValidName(form.emergency_contact_name)) {
       e.emergency_contact_name = 'Emergency contact name must contain letters and spaces only';
@@ -259,8 +296,18 @@ export default function RegisterModal({ isOpen, onClose }) {
                         <p className="text-white sm:text-right wrap-break-word">{form.church}</p>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
-                        <p className="text-slate-400">Address</p>
-                        <p className="text-white sm:text-right wrap-break-word">{form.address || '-'}</p>
+                        <p className="text-slate-400">Small Group Leader</p>
+                        <p className="text-white sm:text-right wrap-break-word">{form.small_group_leader}</p>
+                      </div>
+                      {form.small_group_leader === 'FROM OTHER CHURCH' && (
+                        <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
+                          <p className="text-slate-400">Other Church</p>
+                          <p className="text-white sm:text-right wrap-break-word">{form.other_church || '-'}</p>
+                        </div>
+                      )}
+                      <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
+                        <p className="text-slate-400">How long have you been a Christian?</p>
+                        <p className="text-white sm:text-right wrap-break-word">{form.christian_duration}</p>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">Emergency Contact</p>
@@ -307,12 +354,67 @@ export default function RegisterModal({ isOpen, onClose }) {
                     </div>
                   </div>
 
-                  {/* Church & Preferences */}
+                  {/* Group Info */}
                   <div>
-                    <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Church & Preferences</p>
+                    <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Group & Faith Info</p>
                     <div className="space-y-3">
-                      <Field label="Home Church / Ministry" name="church" value={form.church} onChange={set} error={errors.church} />
-                      <Field label="Complete Address" name="address" placeholder="Brgy., City, Province" value={form.address} onChange={set} error={errors.address} />
+                      <Field
+                        label="Home Church / Ministry"
+                        name="church"
+                        placeholder="Enter your church or ministry"
+                        value={form.church}
+                        onChange={set}
+                        error={errors.church}
+                      />
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Small Group Leader</label>
+                        <select
+                          value={form.small_group_leader}
+                          onChange={(e) => set('small_group_leader', e.target.value)}
+                          className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
+                            errors.small_group_leader ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
+                          }`}
+                        >
+                          <option value="" className="text-slate-900">Select SG Leader</option>
+                          {SG_LEADER_OPTIONS.map((leader) => (
+                            <option key={leader} value={leader} className="text-slate-900">
+                              {leader}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.small_group_leader && <p className="text-red-400 text-xs mt-1">{errors.small_group_leader}</p>}
+                      </div>
+
+                      {form.small_group_leader === 'FROM OTHER CHURCH' && (
+                        <Field
+                          label="From Other Church (Please specify)"
+                          name="other_church"
+                          placeholder="Type your church name"
+                          value={form.other_church}
+                          onChange={set}
+                          error={errors.other_church}
+                        />
+                      )}
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">How long have you been a Christian?</label>
+                        <select
+                          value={form.christian_duration}
+                          onChange={(e) => set('christian_duration', e.target.value)}
+                          className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
+                            errors.christian_duration ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
+                          }`}
+                        >
+                          <option value="" className="text-slate-900">Select duration</option>
+                          {CHRISTIAN_DURATION_OPTIONS.map((duration) => (
+                            <option key={duration} value={duration} className="text-slate-900">
+                              {duration}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.christian_duration && <p className="text-red-400 text-xs mt-1">{errors.christian_duration}</p>}
+                      </div>
                     </div>
                   </div>
 
