@@ -157,7 +157,7 @@ export default function AdminPage() {
         <section className="bg-slate-900/80 border border-white/10 rounded-2xl p-5 md:p-6 mb-6">
           <div className="flex items-center gap-2 text-slate-300 text-sm mb-4">
             <ShieldCheck size={16} className="text-amber-400" />
-            Read token is required to access records
+            Password is required to access records
           </div>
 
           <div className="flex flex-col md:flex-row gap-3">
