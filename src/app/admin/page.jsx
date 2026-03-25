@@ -8,12 +8,12 @@ import ExcelJS from 'exceljs';
 function getExcelColumns() {
   return [
     { header: 'Date Registered', key: 'created_at', width: 24 },
-    { header: 'Full Name', key: 'full_name', width: 24 },
+    { header: 'First Name', key: 'first_name', width: 20 },
+    { header: 'Last Name', key: 'last_name', width: 20 },
     { header: 'Preferred Name', key: 'preferred_name', width: 20 },
     { header: 'Phone', key: 'phone', width: 18 },
     { header: 'Age', key: 'age', width: 10 },
     { header: 'Gender', key: 'gender', width: 14 },
-    { header: 'Church', key: 'church', width: 28 },
     { header: 'Small Group Leader', key: 'small_group_leader', width: 26 },
     { header: 'Other Church', key: 'other_church', width: 30 },
     { header: 'Christian Duration', key: 'christian_duration', width: 22 },
@@ -78,11 +78,11 @@ export default function AdminPage() {
       if (!normalizedQuery) return true;
 
       const searchableText = [
-        record.full_name,
+        record.first_name,
+        record.last_name,
         record.preferred_name,
         record.phone,
         record.gender,
-        record.church,
         record.small_group_leader,
         record.other_church,
         record.christian_duration,
@@ -181,12 +181,12 @@ export default function AdminPage() {
     filteredRecords.forEach((record) => {
       worksheet.addRow({
         created_at: record.created_at ? new Date(record.created_at).toLocaleString() : '',
-        full_name: record.full_name || '',
+        first_name: record.first_name || '',
+        last_name: record.last_name || '',
         preferred_name: record.preferred_name || '',
         phone: record.phone || '',
         age: record.age ?? '',
         gender: record.gender || '',
-        church: record.church || '',
         small_group_leader: record.small_group_leader || '',
         other_church: record.other_church || '',
         christian_duration: record.christian_duration || '',
@@ -381,12 +381,12 @@ export default function AdminPage() {
                   <thead className="bg-white/5 text-slate-300">
                     <tr>
                       <th className="text-left px-4 py-3">Date</th>
-                      <th className="text-left px-4 py-3">Name</th>
+                      <th className="text-left px-4 py-3">First Name</th>
+                      <th className="text-left px-4 py-3">Last Name</th>
                       <th className="text-left px-4 py-3">Preferred</th>
                       <th className="text-left px-4 py-3">Phone</th>
                       <th className="text-left px-4 py-3">Age</th>
                       <th className="text-left px-4 py-3">Gender</th>
-                      <th className="text-left px-4 py-3">Church</th>
                       <th className="text-left px-4 py-3">SG Leader</th>
                       <th className="text-left px-4 py-3">Christian Duration</th>
                       <th className="text-left px-4 py-3">Emergency Contact</th>
@@ -396,12 +396,12 @@ export default function AdminPage() {
                     {paginatedRecords.map((record) => (
                       <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors">
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
-                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.full_name}</td>
+                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.first_name}</td>
+                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.last_name}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.preferred_name || '-'}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.church || '-'}</td>
                         <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
                           {record.small_group_leader}
                           {record.small_group_leader === 'FROM OTHER CHURCH' && record.other_church ? ` (${record.other_church})` : ''}

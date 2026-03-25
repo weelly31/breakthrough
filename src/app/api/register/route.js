@@ -1,12 +1,12 @@
 import getClientPromise from '@/lib/mongodb';
 
 const REQUIRED_FIELDS = [
-  'full_name',
+  'first_name',
+  'last_name',
   'preferred_name',
   'phone',
   'age',
   'gender',
-  'church',
   'small_group_leader',
   'christian_duration',
   'emergency_contact_name',
@@ -24,10 +24,6 @@ function normalizePhilippineMobile(value) {
 
 function isValidName(value) {
   return /^[A-Za-z\s]+$/.test(String(value ?? '').trim());
-}
-
-function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function toUpperTrimmed(value) {
@@ -100,12 +96,17 @@ export async function POST(request) {
       return Response.json({ error: 'Age must be between 10 and 65.' }, { status: 400 });
     }
 
-    const fullName = toUpperTrimmed(body.full_name);
+    const firstName = toUpperTrimmed(body.first_name);
+    const lastName = toUpperTrimmed(body.last_name);
     const preferredName = toUpperTrimmed(body.preferred_name);
     const emergencyContactName = toUpperTrimmed(body.emergency_contact_name);
 
-    if (!isValidName(fullName)) {
-      return Response.json({ error: 'Invalid full name. Use letters and spaces only.' }, { status: 400 });
+    if (!isValidName(firstName)) {
+      return Response.json({ error: 'Invalid first name. Use letters and spaces only.' }, { status: 400 });
+    }
+
+    if (!isValidName(lastName)) {
+      return Response.json({ error: 'Invalid last name. Use letters and spaces only.' }, { status: 400 });
     }
 
     if (!isValidName(preferredName)) {
@@ -143,24 +144,25 @@ export async function POST(request) {
     const client = await getClientPromise();
     const db = client.db(process.env.MONGODB_DB || 'breakthrough');
 
-    const duplicatePreferredName = await db.collection('registrations').findOne({
-      preferred_name: { $regex: `^${escapeRegex(preferredName)}$`, $options: 'i' },
+    const duplicate = await db.collection('registrations').findOne({
+      first_name: { $regex: `^${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
+      last_name: { $regex: `^${lastName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
     });
 
-    if (duplicatePreferredName) {
+    if (duplicate) {
       return Response.json(
-        { error: 'Preferred name already exists. Please choose a different preferred name.' },
+        { error: 'A registration with the same first and last name already exists.' },
         { status: 409 },
       );
     }
 
     const registration = {
-      full_name: fullName,
+      first_name: firstName,
+      last_name: lastName,
       preferred_name: preferredName,
       phone: normalizedPhone,
       age,
       gender: toUpperTrimmed(body.gender),
-      church: toUpperTrimmed(body.church),
       small_group_leader: smallGroupLeader,
       other_church: otherChurch,
       christian_duration: christianDuration,

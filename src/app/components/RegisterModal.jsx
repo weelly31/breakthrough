@@ -30,15 +30,15 @@ const CHRISTIAN_DURATION_OPTIONS = [
 ];
 
 const initialForm = {
-  full_name: '', preferred_name: '', phone: '', age: '', gender: '',
-  church: '', small_group_leader: '', other_church: '', christian_duration: '',
+  first_name: '', last_name: '', preferred_name: '', phone: '', age: '', gender: '',
+  small_group_leader: '', other_church: '', christian_duration: '',
   emergency_contact_name: '', emergency_contact_number: '', emergency_contact_relation: '',
 };
 
 const UPPERCASE_FIELDS = new Set([
-  'full_name',
+  'first_name',
+  'last_name',
   'preferred_name',
-  'church',
   'other_church',
   'emergency_contact_name',
   'emergency_contact_relation',
@@ -126,9 +126,13 @@ export default function RegisterModal({ isOpen, onClose }) {
 
   const validate = () => {
     const e = {};
-    if (!form.full_name.trim()) e.full_name = 'Required';
-    if (form.full_name.trim() && !isValidName(form.full_name)) {
-      e.full_name = 'Name must contain letters and spaces only';
+    if (!form.first_name.trim()) e.first_name = 'Required';
+    if (form.first_name.trim() && !isValidName(form.first_name)) {
+      e.first_name = 'Letters only';
+    }
+    if (!form.last_name.trim()) e.last_name = 'Required';
+    if (form.last_name.trim() && !isValidName(form.last_name)) {
+      e.last_name = 'Letters only';
     }
     if (!form.preferred_name.trim()) e.preferred_name = 'Required';
     if (form.preferred_name.trim() && !isValidName(form.preferred_name)) {
@@ -140,7 +144,6 @@ export default function RegisterModal({ isOpen, onClose }) {
     }
     if (!form.age || isNaN(form.age) || +form.age < 12 || +form.age > 35) e.age = 'Age must be 12-35';
     if (!form.gender) e.gender = 'Required';
-    if (!form.church.trim()) e.church = 'Required';
     if (!form.small_group_leader) e.small_group_leader = 'Required';
     if (form.small_group_leader === 'FROM OTHER CHURCH' && !form.other_church.trim()) {
       e.other_church = 'Please specify your church';
@@ -257,7 +260,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <Sparkles size={36} className="text-amber-400" />
                   </motion.div>
                   <h3 className="text-2xl font-black text-white">You&apos;re Registered! 🎉</h3>
-                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.preferred_name.trim() || form.full_name}</span>! See you at the retreat!</p>
+                  <p className="text-slate-400 text-sm">Welcome, <span className="text-amber-400 font-semibold">{form.preferred_name.trim() || `${form.first_name} ${form.last_name}`.trim()}</span>! See you at the retreat!</p>
                   <div className="bg-white/5 rounded-2xl p-5 w-full text-left space-y-2 text-sm mt-2">
                     <div className="flex items-center gap-2 text-slate-400"><CalendarDays size={14} className="text-amber-400" /> April 30 – May 2, 2026</div>
                     <div className="flex items-center gap-2 text-slate-400"><MapPin size={14} className="text-amber-400" /> Guronasyon Foundation Inc. NHS, Bilibiran, Binangonan, Rizal</div>
@@ -276,8 +279,12 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Review Details</p>
                     <div className="bg-white/5 rounded-2xl border border-white/10 divide-y divide-white/10">
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
-                        <p className="text-slate-400">Full Name</p>
-                        <p className="text-white sm:text-right wrap-break-word">{form.full_name}</p>
+                        <p className="text-slate-400">First Name</p>
+                        <p className="text-white sm:text-right wrap-break-word">{form.first_name}</p>
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
+                        <p className="text-slate-400">Last Name</p>
+                        <p className="text-white sm:text-right wrap-break-word">{form.last_name}</p>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">Preferred Name</p>
@@ -290,10 +297,6 @@ export default function RegisterModal({ isOpen, onClose }) {
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">Age / Gender</p>
                         <p className="text-white sm:text-right wrap-break-word">{form.age} / {form.gender}</p>
-                      </div>
-                      <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
-                        <p className="text-slate-400">Home Church / Ministry</p>
-                        <p className="text-white sm:text-right wrap-break-word">{form.church}</p>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">Small Group Leader</p>
@@ -331,7 +334,10 @@ export default function RegisterModal({ isOpen, onClose }) {
                   <div>
                     <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Personal Info</p>
                     <div className="space-y-3">
-                      <Field label="Full Name" name="full_name" placeholder="Juan dela Cruz" value={form.full_name} onChange={set} error={errors.full_name} />
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <Field label="First Name" name="first_name" placeholder="Juan" value={form.first_name} onChange={set} error={errors.first_name} />
+                        <Field label="Last Name" name="last_name" placeholder="Dela Cruz" value={form.last_name} onChange={set} error={errors.last_name} />
+                      </div>
                       <Field label="Nickname / Preferred Name" name="preferred_name" placeholder="What should we call you?" value={form.preferred_name} onChange={set} error={errors.preferred_name} />
                       <Field label="Contact Number" name="phone" type="tel" placeholder="09XXXXXXXXX" value={form.phone} onChange={set} error={errors.phone} inputMode="numeric" pattern="^\+?\d*$" />
                       <div className="grid sm:grid-cols-2 gap-3">
@@ -356,17 +362,8 @@ export default function RegisterModal({ isOpen, onClose }) {
 
                   {/* Group Info */}
                   <div>
-                    <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Group & Faith Info</p>
+                    <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Home Church / Ministry</p>
                     <div className="space-y-3">
-                      <Field
-                        label="Home Church / Ministry"
-                        name="church"
-                        placeholder="Enter your church or ministry"
-                        value={form.church}
-                        onChange={set}
-                        error={errors.church}
-                      />
-
                       <div>
                         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Small Group Leader</label>
                         <select
