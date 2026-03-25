@@ -23,7 +23,7 @@ export default function HeroSection({ heroImage, onRegister }) {
     <section id="hero" className="relative h-screen min-h-175 flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <img src={heroImage} alt="Youth Retreat Hero" className="w-full h-full object-cover" />
+        <img src={heroImage} alt="Summer Retreat Hero" className="w-full h-full object-cover" />
         {/* Multi-layer gradient for depth */}
         <div className="absolute inset-0 bg-linear-to-b from-slate-900/80 via-slate-900/40 to-slate-900/95" />
         <div className="absolute inset-0 bg-linear-to-r from-slate-900/40 via-transparent to-slate-900/40" />
@@ -58,7 +58,7 @@ export default function HeroSection({ heroImage, onRegister }) {
           className="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-400/30 text-amber-300 tracking-[0.25em] uppercase text-xs font-bold px-5 py-2 rounded-full mb-8 backdrop-blur-sm"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-          Youth Retreat 2026
+          Summer Retreat 2026
         </motion.div>
 
         {/* Main title */}

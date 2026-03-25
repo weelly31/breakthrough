@@ -161,7 +161,7 @@ export default function RegisterModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0 border-b border-white/5">
               <div>
-                <p className="text-amber-400 text-xs tracking-[0.25em] uppercase font-bold">Youth Retreat 2026</p>
+                <p className="text-amber-400 text-xs tracking-[0.25em] uppercase font-bold">Summer Retreat 2026</p>
                 <h2 className="text-white text-xl font-black leading-tight">Register Now</h2>
               </div>
               <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">

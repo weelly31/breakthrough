@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Download, RefreshCcw, ShieldCheck } from 'lucide-react';
+import { Download, RefreshCcw, Search, ShieldCheck, X } from 'lucide-react';
 import ExcelJS from 'exceljs';
 
 function getExcelColumns() {
@@ -27,11 +27,65 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [churchFilter, setChurchFilter] = useState('');
 
   const formattedRecords = useMemo(
     () => records.map((item) => ({ ...item, _createdDisplay: new Date(item.created_at).toLocaleString() })),
     [records],
   );
+
+  const filterOptions = useMemo(() => {
+    const genders = Array.from(new Set(
+      records
+        .map((item) => String(item.gender || '').trim())
+        .filter(Boolean),
+    ));
+
+    const churches = Array.from(new Set(
+      records
+        .map((item) => String(item.church || '').trim())
+        .filter(Boolean),
+    ));
+
+    return {
+      genders: genders.sort((a, b) => a.localeCompare(b)),
+      churches: churches.sort((a, b) => a.localeCompare(b)),
+    };
+  }, [records]);
+
+  const filteredRecords = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const normalizedChurch = churchFilter.trim().toLowerCase();
+
+    return formattedRecords.filter((record) => {
+      if (genderFilter !== 'all' && String(record.gender || '').toLowerCase() !== genderFilter.toLowerCase()) {
+        return false;
+      }
+
+      if (normalizedChurch && String(record.church || '').toLowerCase() !== normalizedChurch) {
+        return false;
+      }
+
+      if (!normalizedQuery) return true;
+
+      const searchableText = [
+        record.full_name,
+        record.preferred_name,
+        record.phone,
+        record.gender,
+        record.church,
+        record.emergency_contact_name,
+        record.emergency_contact_number,
+      ]
+        .map((value) => String(value || '').toLowerCase())
+        .join(' ');
+
+      return searchableText.includes(normalizedQuery);
+    });
+  }, [formattedRecords, searchQuery, genderFilter, churchFilter]);
 
   const loadRegistrations = async () => {
     setLoading(true);
@@ -60,8 +114,19 @@ export default function AdminPage() {
     }
   };
 
+  const handleSearch = () => {
+    setSearchQuery(searchInput.trim());
+  };
+
+  const clearFilters = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    setGenderFilter('all');
+    setChurchFilter('');
+  };
+
   const exportExcel = async () => {
-    if (!records.length) return;
+    if (!filteredRecords.length) return;
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Registrations', {
@@ -84,7 +149,7 @@ export default function AdminPage() {
       fgColor: { argb: 'FFF3F4F6' },
     };
 
-    records.forEach((record) => {
+    filteredRecords.forEach((record) => {
       worksheet.addRow({
         created_at: record.created_at ? new Date(record.created_at).toLocaleString() : '',
         full_name: record.full_name || '',
@@ -192,18 +257,83 @@ export default function AdminPage() {
         <section className="bg-slate-900/50 border border-white/10 rounded-2xl overflow-hidden">
           <div className="px-5 md:px-6 py-4 border-b border-white/10 flex items-center justify-between">
             <h2 className="font-bold">Registered Participants</h2>
-            <span className="text-sm text-slate-400">{records.length} records</span>
+            <span className="text-sm text-slate-400">{filteredRecords.length} / {records.length} records</span>
           </div>
 
+          {!!records.length && (
+            <div className="px-5 md:px-6 py-4 border-b border-white/10 bg-slate-900/50">
+              <div className="grid lg:grid-cols-12 gap-3">
+                <div className="lg:col-span-6 flex gap-2">
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSearch();
+                    }}
+                    placeholder="Search name, phone, church, emergency contact..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-amber-400"
+                  />
+                  <button
+                    onClick={handleSearch}
+                    className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 px-4 py-2.5 rounded-xl font-semibold text-sm"
+                  >
+                    <Search size={14} /> Search
+                  </button>
+                </div>
+
+                <div className="lg:col-span-3">
+                  <select
+                    value={genderFilter}
+                    onChange={(e) => setGenderFilter(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
+                  >
+                    <option value="all" className="text-slate-900">All Genders</option>
+                    {filterOptions.genders.map((gender) => (
+                      <option key={gender} value={gender} className="text-slate-900">
+                        {gender}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="lg:col-span-3 flex gap-2">
+                  <select
+                    value={churchFilter}
+                    onChange={(e) => setChurchFilter(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
+                  >
+                    <option value="" className="text-slate-900">All Churches</option>
+                    {filterOptions.churches.map((church) => (
+                      <option key={church} value={church} className="text-slate-900">
+                        {church}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-1.5 border border-white/20 hover:border-amber-300 text-white px-3 py-2.5 rounded-xl text-sm"
+                  >
+                    <X size={14} /> Clear
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!loaded && (
-            <div className="p-8 text-slate-400 text-sm">Enter your token and click Load Data.</div>
+            <div className="p-8 text-slate-400 text-sm">Enter your password and click Load Data.</div>
           )}
 
           {loaded && !records.length && !error && (
             <div className="p-8 text-slate-400 text-sm">No records found yet.</div>
           )}
 
-          {!!records.length && (
+          {!!records.length && !filteredRecords.length && (
+            <div className="p-8 text-slate-400 text-sm">No records match your search/filter.</div>
+          )}
+
+          {!!filteredRecords.length && (
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead className="bg-white/5 text-slate-300">
@@ -219,7 +349,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {formattedRecords.map((record) => (
+                  {filteredRecords.map((record) => (
                     <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors">
                       <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
                       <td className="px-4 py-3 text-white whitespace-nowrap">{record.full_name}</td>

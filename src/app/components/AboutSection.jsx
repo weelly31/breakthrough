@@ -36,7 +36,7 @@ export default function AboutSection({ aboutImage }) {
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img src={aboutImage} alt="Youth Retreat Fellowship" className="w-full h-100 md:h-125 object-cover" />
+              <img src={aboutImage} alt="Summer Retreat Fellowship" className="w-full h-100 md:h-125 object-cover" />
               <div className="absolute inset-0 bg-linear-to-t from-slate-900/30 to-transparent" />
             </div>
             {/* Decorative accent */}
@@ -56,7 +56,7 @@ export default function AboutSection({ aboutImage }) {
               Let Faith Arise
             </h2>
             <p className="text-slate-600 text-lg leading-relaxed mb-8">
-              Feeling on fire, or feeling distant from God? This Youth Retreat 2026 is for you! A powerful encounter where walls fall, fears break, and faith rises. Come ready to experience breakthrough, deepen your walk with God, and step into His purpose.
+              Feeling on fire, or feeling distant from God? This Summer Retreat 2026 is for you! A powerful encounter where walls fall, fears break, and faith rises. Come ready to experience breakthrough, deepen your walk with God, and step into His purpose.
             </p>
             <p className="text-slate-500 leading-relaxed mb-10">
               The Living Saviour Christian Fellowship invites all our youth and young professionals to join this first-ever retreat. Whether your faith is on fire, growing, or just starting — your breakthrough starts here. Let your faith arise!
