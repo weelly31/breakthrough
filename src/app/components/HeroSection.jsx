@@ -66,7 +66,7 @@ export default function HeroSection({ heroImage, onRegister }) {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.15 }}
-          className="font-black text-white tracking-tight leading-[0.95] mb-2 text-center text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-2xl wrap-break-word"
+          className="font-black text-white tracking-normal sm:tracking-tight leading-[0.95] mb-3 text-center text-4xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-2xl wrap-break-word px-2"
         >
           BREAKTHROUGH
         </motion.h1>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -110,13 +109,6 @@ export default function Navbar({ onRegister }) {
                   {link.label}
                 </button>
               ))}
-              <Link
-                href="/admin"
-                onClick={() => setMobileOpen(false)}
-                className="text-white/80 hover:text-amber-400 text-left py-2 text-base font-medium tracking-wide transition-colors"
-              >
-                Admin
-              </Link>
               <button
                 onClick={() => {
                   setMobileOpen(false);
