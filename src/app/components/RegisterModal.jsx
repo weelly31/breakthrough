@@ -11,6 +11,24 @@ const initialForm = {
   emergency_contact_name: '', emergency_contact_number: '', emergency_contact_relation: '',
 };
 
+const UPPERCASE_FIELDS = new Set([
+  'full_name',
+  'preferred_name',
+  'church',
+  'address',
+  'emergency_contact_name',
+  'emergency_contact_relation',
+]);
+
+const PHONE_FIELDS = new Set(['phone', 'emergency_contact_number']);
+
+function sanitizePhoneInput(value) {
+  const input = String(value ?? '');
+  const hasLeadingPlus = input.startsWith('+');
+  const digitsOnly = input.replace(/\D/g, '');
+  return hasLeadingPlus ? `+${digitsOnly}` : digitsOnly;
+}
+
 function normalizePhilippineMobile(value) {
   const cleaned = String(value ?? '').trim().replace(/[\s()-]/g, '');
   if (/^09\d{9}$/.test(cleaned)) return `+63${cleaned.slice(1)}`;
@@ -23,7 +41,7 @@ function isValidName(value) {
   return /^[A-Za-z\s]+$/.test(String(value ?? '').trim());
 }
 
-function Field({ label, name, type = 'text', placeholder, value, onChange, error }) {
+function Field({ label, name, type = 'text', placeholder, value, onChange, error, inputMode, pattern }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
@@ -32,6 +50,8 @@ function Field({ label, name, type = 'text', placeholder, value, onChange, error
         value={value}
         onChange={e => onChange(name, e.target.value)}
         placeholder={placeholder}
+        inputMode={inputMode}
+        pattern={pattern}
         className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
           error ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
         }`}
@@ -55,7 +75,22 @@ export default function RegisterModal({ isOpen, onClose }) {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  const set = (field, val) => setForm(f => ({ ...f, [field]: val }));
+  const set = (field, val) => setForm(f => {
+    let nextValue = val;
+
+    if (PHONE_FIELDS.has(field)) {
+      nextValue = sanitizePhoneInput(val);
+    }
+
+    if (UPPERCASE_FIELDS.has(field)) {
+      nextValue = String(nextValue ?? '').toUpperCase();
+    }
+
+    return {
+      ...f,
+      [field]: nextValue,
+    };
+  });
 
   const validate = () => {
     const e = {};
@@ -251,7 +286,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <div className="space-y-3">
                       <Field label="Full Name" name="full_name" placeholder="Juan dela Cruz" value={form.full_name} onChange={set} error={errors.full_name} />
                       <Field label="Nickname / Preferred Name" name="preferred_name" placeholder="What should we call you?" value={form.preferred_name} onChange={set} error={errors.preferred_name} />
-                      <Field label="Contact Number" name="phone" type="tel" placeholder="09XXXXXXXXX" value={form.phone} onChange={set} error={errors.phone} />
+                      <Field label="Contact Number" name="phone" type="tel" placeholder="09XXXXXXXXX" value={form.phone} onChange={set} error={errors.phone} inputMode="numeric" pattern="^\+?\d*$" />
                       <div className="grid sm:grid-cols-2 gap-3">
                         <Field label="Age" name="age" type="number" placeholder="18" value={form.age} onChange={set} error={errors.age} />
                         <div>
@@ -287,7 +322,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                     <div className="space-y-3">
                       <Field label="Name" name="emergency_contact_name" placeholder="Full name" value={form.emergency_contact_name} onChange={set} error={errors.emergency_contact_name} />
                       <div className="grid sm:grid-cols-2 gap-3">
-                        <Field label="Contact Number" name="emergency_contact_number" type="tel" placeholder="09XXXXXXXXX" value={form.emergency_contact_number} onChange={set} error={errors.emergency_contact_number} />
+                        <Field label="Contact Number" name="emergency_contact_number" type="tel" placeholder="09XXXXXXXXX" value={form.emergency_contact_number} onChange={set} error={errors.emergency_contact_number} inputMode="numeric" pattern="^\+?\d*$" />
                         <Field label="Relationship" name="emergency_contact_relation" placeholder="e.g. Parent" value={form.emergency_contact_relation} onChange={set} error={errors.emergency_contact_relation} />
                       </div>
                     </div>

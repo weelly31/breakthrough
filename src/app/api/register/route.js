@@ -28,6 +28,10 @@ function escapeRegex(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function toUpperTrimmed(value) {
+  return String(value ?? '').trim().toUpperCase();
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -94,9 +98,9 @@ export async function POST(request) {
       return Response.json({ error: 'Age must be between 10 and 65.' }, { status: 400 });
     }
 
-    const fullName = String(body.full_name).trim();
-    const preferredName = String(body.preferred_name).trim();
-    const emergencyContactName = String(body.emergency_contact_name).trim();
+    const fullName = toUpperTrimmed(body.full_name);
+    const preferredName = toUpperTrimmed(body.preferred_name);
+    const emergencyContactName = toUpperTrimmed(body.emergency_contact_name);
 
     if (!isValidName(fullName)) {
       return Response.json({ error: 'Invalid full name. Use letters and spaces only.' }, { status: 400 });
@@ -146,12 +150,12 @@ export async function POST(request) {
       preferred_name: preferredName,
       phone: normalizedPhone,
       age,
-      gender: String(body.gender).trim(),
-      church: String(body.church).trim(),
-      address: String(body.address ?? '').trim(),
+      gender: toUpperTrimmed(body.gender),
+      church: toUpperTrimmed(body.church),
+      address: toUpperTrimmed(body.address ?? ''),
       emergency_contact_name: emergencyContactName,
       emergency_contact_number: normalizedEmergencyPhone,
-      emergency_contact_relation: String(body.emergency_contact_relation).trim(),
+      emergency_contact_relation: toUpperTrimmed(body.emergency_contact_relation),
       created_at: new Date(),
     };
 
