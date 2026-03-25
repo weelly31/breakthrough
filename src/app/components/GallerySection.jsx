@@ -22,9 +22,9 @@ export default function GallerySection({ galleryImages }) {
           className="text-center max-w-2xl mx-auto mb-16"
         >
           <p className="text-amber-400 tracking-[0.2em] uppercase text-sm font-semibold mb-3">Memories</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Camp Gallery</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Retreat Gallery </h2>
           <p className="text-slate-400 text-lg">
-            A glimpse into the incredible moments that make Youth Camp an unforgettable experience.
+            A glimpse into the incredible moments that make Summer Retreat an unforgettable experience.
           </p>
         </motion.div>
 

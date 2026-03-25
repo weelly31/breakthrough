@@ -34,7 +34,7 @@ export default function Navbar({ onRegister }) {
     }`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <button onClick={() => scrollTo('#hero')} className="text-white font-bold text-xl tracking-wider">
-          YOUTH RETREAT <span className="text-amber-400">2026</span>
+          SUMMER <span className="text-amber-400">RETREAT</span> 2026
         </button>
 
         {/* Desktop */}

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Youth Camp 2026",
-  description: "Join us for an unforgettable experience at Youth Camp 2026!",
+  title: "Summer Retreat 2026",
+  description: "Join us for an unforgettable experience at Summer Retreat 2026!",
 };
 
 export default function RootLayout({
