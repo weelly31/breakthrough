@@ -22,6 +22,39 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+}
+
+.poster-title {
+  font-family: var(--font-poster), Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(3.35rem, 15.2vw, 13.5rem);
+  font-weight: 700;
+  font-stretch: condensed;
+  display: inline-block;
+  width: fit-content;
+  max-width: none;
+  white-space: nowrap;
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+  transform: scaleX(0.9);
+  transform-origin: center;
+  text-rendering: geometricPrecision;
+}
+
+@media (max-width: 640px) {
+  .poster-title {
+    font-size: clamp(2.8rem, 13.8vw, 5rem);
+    letter-spacing: -0.028em;
+    line-height: 0.9;
+    transform: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .poster-title {
+    font-size: clamp(7rem, 15vw, 14rem);
+    letter-spacing: -0.05em;
+    transform: scaleX(0.88);
+  }
 }

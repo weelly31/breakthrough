@@ -11,7 +11,7 @@ import Footer from './components/Footer';
 import RegisterModal from './components/RegisterModal';
 
 const IMAGES = {
-  hero: '/img/bg.png',
+  hero: '/img/5.png',
   about: '/img/journey.jpg',
   activities: [
     '/img/worship.jpg',

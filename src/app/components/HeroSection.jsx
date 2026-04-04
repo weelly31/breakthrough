@@ -1,17 +1,9 @@
 "use client";
 
+import Image from 'next/image';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, MapPin, CalendarDays } from 'lucide-react';
-
-const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
-  id: i,
-  left: `${(i * 17.37) % 100}%`,
-  top: `${(i * 29.13 + 11) % 100}%`,
-  duration: 3 + (i % 5) * 0.8,
-  delay: (i % 4) * 0.35,
-  size: i % 3 === 0 ? 'w-1.5 h-1.5' : 'w-1 h-1',
-}));
+import { CalendarDays, ChevronDown, MapPin } from 'lucide-react';
 
 export default function HeroSection({ heroImage, onRegister }) {
   const scrollToAbout = () => {
@@ -20,132 +12,108 @@ export default function HeroSection({ heroImage, onRegister }) {
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12 sm:pt-28 sm:pb-16">
-      {/* Background */}
+    <section id="hero" className="relative min-h-svh overflow-hidden bg-[#09141a] pt-20 sm:pt-28">
       <div className="absolute inset-0">
-        <img src={heroImage} alt="Summer Retreat Hero" className="w-full h-full object-cover" />
-        {/* Multi-layer gradient for depth */}
-        <div className="absolute inset-0 bg-linear-to-b from-slate-900/80 via-slate-900/40 to-slate-900/95" />
-        <div className="absolute inset-0 bg-linear-to-r from-slate-900/40 via-transparent to-slate-900/40" />
+        <Image
+          src={heroImage}
+          alt="Breakthrough Summer Retreat poster background"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-linear-to-b from-[#8eb8d4]/30 via-transparent via-35% to-[#2f190d]/30" />
+        <div className="absolute inset-0 bg-linear-to-b from-[#07131e]/36 via-transparent to-[#130a06]/62" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#07131e]/22 via-transparent to-[#1c140f]/26" />
       </div>
 
-      {/* Ambient glow behind title */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-88 h-44 sm:w-120 sm:h-60 bg-amber-500/10 rounded-full blur-[100px]" />
-      </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-[#d4e8f5]/18 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-[#d89d6f]/42 to-transparent" />
 
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {PARTICLES.map((particle) => (
-          <motion.div
-            key={particle.id}
-            className={`absolute ${particle.size} bg-amber-400/30 rounded-full`}
-            style={{ left: particle.left, top: particle.top }}
-            animate={{ y: [-20, 20], opacity: [0.15, 0.7, 0.15] }}
-            transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
-          />
-        ))}
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto">
-
-        {/* Event badge */}
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] w-full max-w-375 flex-col justify-center gap-5 px-4 pb-5 sm:min-h-[calc(100svh-7rem)] sm:justify-between sm:gap-0 sm:px-6 sm:pb-10 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-400/30 text-amber-300 tracking-[0.2em] sm:tracking-[0.25em] uppercase text-[10px] sm:text-xs font-bold px-4 sm:px-5 py-2 rounded-full mb-6 sm:mb-8 backdrop-blur-sm"
+          className="pt-4 text-center text-white"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-          Summer Retreat 2026
+        
+          <p className="mt-2 text-[13px] font-semibold uppercase tracking-[0.48em] text-white/95 sm:text-xl sm:tracking-[0.72em]">
+             The Living Saviour Christian Fellowship
+          </p>
         </motion.div>
 
-        {/* Main title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.15 }}
-          className="font-black text-white tracking-normal sm:tracking-tight leading-[0.95] mb-3 text-center text-4xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-2xl wrap-break-word px-2"
-        >
-          BREAKTHROUGH
-        </motion.h1>
-
-        {/* Divider line */}
         <motion.div
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
-          className="flex items-center justify-center gap-4 mb-5"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.95, delay: 0.12 }}
+          className="flex flex-col items-center justify-center pt-1 text-center sm:flex-1 sm:pt-0"
         >
-          <span className="h-px w-16 md:w-28 bg-linear-to-r from-transparent to-amber-400/60" />
-          <span className="text-amber-400 text-lg">✦</span>
-          <span className="h-px w-16 md:w-28 bg-linear-to-l from-transparent to-amber-400/60" />
+          <div className="flex w-full justify-center px-1 sm:px-4">
+            <h1 className="poster-title uppercase text-center text-white drop-shadow-[0_18px_28px_rgba(0,0,0,0.25)]">
+              Breakthrough
+            </h1>
+          </div>
+          <p className="mt-3 text-[clamp(1.35rem,4vw,4rem)] font-black uppercase tracking-[-0.04em] text-white sm:mt-4">
+            Let Faith Arise
+          </p>
+          <div className="mt-3.5 w-full max-w-240 rounded-[1.75rem] border border-white/12 bg-linear-to-br from-black/38 via-black/24 to-[#9c693d]/20 px-4 py-4 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-xs sm:mt-5 sm:px-6 sm:py-5">
+            <div className="flex items-center justify-center gap-3">
+              <span className="h-px w-10 bg-linear-to-r from-transparent to-[#f1d2a8] sm:w-16" />
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-[#f8e4c9] sm:text-sm">
+                Joshua 6:20
+              </p>
+              <span className="h-px w-10 bg-linear-to-l from-transparent to-[#f1d2a8] sm:w-16" />
+            </div>
+            <p className="mx-auto mt-3 max-w-215 px-1 text-sm leading-snug text-white/95 sm:text-lg md:text-[1.5rem] md:leading-tight">
+              &ldquo;When the trumpets sounded, the army shouted, and at the sound of the trumpet,
+              when the men gave a loud shout, the wall collapsed.&rdquo;
+            </p>
+          </div>
         </motion.div>
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.45 }}
-          className="text-amber-300 text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-[0.2em] sm:tracking-widest uppercase mb-4 sm:mb-5 text-center"
-        >
-          &ldquo;Let Faith Arise&rdquo;
-        </motion.p>
-
-        {/* Scripture quote */}
-        <motion.p
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.55 }}
-          className="text-white/80 text-sm md:text-base italic mb-8 sm:mb-10 text-center"
-        >
-          &ldquo;When the trumpets sounded&hellip; the wall collapsed.&rdquo; &ndash; Joshua 6:20
-        </motion.p>
-
-        {/* Event meta */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.65 }}
-          className="flex flex-wrap justify-center gap-3 sm:gap-4 text-white/70 text-xs sm:text-sm mb-8 sm:mb-10"
+          transition={{ duration: 0.85, delay: 0.28 }}
+          className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 pb-3 text-center sm:gap-4 sm:pb-8"
         >
-          <span className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 sm:px-4 py-2 rounded-full backdrop-blur-sm">
-            <CalendarDays size={14} className="text-amber-400" /> April 30 – May 2, 2026
-          </span>
-          <span className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 sm:px-4 py-2 rounded-full backdrop-blur-sm max-w-full">
-            <MapPin size={14} className="text-amber-400" /> Guronasyon Foundation Inc. NHS, Bilibiran, Binangonan, Rizal
-          </span>
-        </motion.div>
+          <div className="flex w-full flex-col items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/92 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3 sm:text-sm sm:tracking-[0.22em]">
+            <span className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full border border-white/28 bg-black/16 px-4 py-2 text-center backdrop-blur-[2px] sm:w-auto">
+              <CalendarDays size={14} className="text-[#f0d5b5]" />
+              April 30 - May 2, 2026
+            </span>
+            <span className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-[1.25rem] border border-white/28 bg-black/16 px-4 py-2 text-center backdrop-blur-[2px] sm:w-auto sm:max-w-md sm:px-5">
+              <MapPin size={14} className="mt-0.5 shrink-0 text-[#f0d5b5]" />
+              <span className="leading-tight tracking-[0.12em] sm:text-left sm:tracking-[0.16em]">
+                <span className="block">Guronasyon Foundation Inc. NHS</span>
+              </span>
+            </span>
+          </div>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.75 }}
-          className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4"
-        >
-          <button
-            onClick={onRegister}
-            className="relative overflow-hidden bg-amber-500 hover:bg-amber-400 text-slate-900 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-black text-xs sm:text-sm tracking-[0.2em] sm:tracking-widest uppercase transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/40 hover:scale-105"
-          >
-            Register Now
-          </button>
-          <button
-            onClick={scrollToAbout}
-            className="border border-white/30 hover:border-amber-400/60 hover:text-amber-300 text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-medium text-xs sm:text-sm tracking-[0.2em] sm:tracking-widest uppercase transition-all duration-300 backdrop-blur-sm"
-          >
-            Learn More
-          </button>
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <button
+              onClick={onRegister}
+              className="rounded-full border border-[#f7b24d]/70 bg-[#f59e0b] px-9 py-3 text-xs font-black uppercase tracking-[0.26em] text-[#1f1308] shadow-[0_18px_35px_rgba(245,158,11,0.35)] transition-all duration-300 hover:scale-[1.05] hover:bg-[#f7aa22] hover:shadow-[0_24px_45px_rgba(245,158,11,0.45)]"
+            >
+              Register Now
+            </button>
+            <button
+              onClick={scrollToAbout}
+              className="rounded-full border border-white/45 bg-white/10 px-9 py-3 text-xs font-black uppercase tracking-[0.26em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.16)] backdrop-blur-[3px] transition-all duration-300 hover:scale-[1.03] hover:border-[#f6d39d]/75 hover:bg-white/16 hover:text-[#fff2dc]"
+            >
+              Learn More
+            </button>
+          </div>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.button
         onClick={scrollToAbout}
-        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 text-white/50 hover:text-white transition-colors"
+        className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 text-white/60 transition-colors hover:text-white sm:bottom-6"
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
+        aria-label="Scroll to about section"
       >
         <ChevronDown size={28} />
       </motion.button>
