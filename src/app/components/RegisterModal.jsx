@@ -6,6 +6,8 @@ import { X, Loader2, Sparkles, MapPin, CalendarDays } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const SG_LEADER_OPTIONS = [
+  'NO SG LEADER YET',
+  'FROM OTHER CHURCH',
   'PTR. ALLEN',
   'KIM',
   'KEVIN',
@@ -18,8 +20,7 @@ const SG_LEADER_OPTIONS = [
   'LUIZ',
   'BEA',
   'MARIE JOYCE',
-  'NO SG LEADER YET',
-  'FROM OTHER CHURCH',
+
 ];
 
 const CHRISTIAN_DURATION_OPTIONS = [
@@ -29,9 +30,31 @@ const CHRISTIAN_DURATION_OPTIONS = [
   '10 YEARS ABOVE',
 ];
 
+const PAYMENT_OPTIONS = [
+  {
+    value: 'GCASH',
+    label: 'GCash',
+    images: [{ src: '/img/gcash.jpg?v=20260404', alt: 'GCash QR' }],
+  },
+  {
+    value: 'BANK TRANSFER',
+    label: 'Bank Transfer',
+    images: [
+      { src: '/img/maribank.jpg?v=20260404', alt: 'Bank Transfer QR' },
+      { src: '/img/landbank.jpg?v=20260404', alt: 'Bank Transfer QR' },
+    ],
+  },
+  {
+    value: 'CASH',
+    label: 'Cash',
+    note: 'Cash payments can be settled in person during the retreat registration process.',
+  },
+];
+
 const initialForm = {
   first_name: '', last_name: '', preferred_name: '', phone: '', age: '', gender: '',
   small_group_leader: '', other_church: '', christian_duration: '',
+  payment_method: '',
   emergency_contact_name: '', emergency_contact_number: '', emergency_contact_relation: '',
 };
 
@@ -85,19 +108,43 @@ function Field({ label, name, type = 'text', placeholder, value, onChange, error
   );
 }
 
+function getPaymentOption(method) {
+  return PAYMENT_OPTIONS.find((option) => option.value === method) || null;
+}
+
 export default function RegisterModal({ isOpen, onClose }) {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [reviewMode, setReviewMode] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [retreatConsentGiven, setRetreatConsentGiven] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (isOpen) { setForm(initialForm); setErrors({}); setSubmitError(''); setReviewMode(false); setDone(false); }
+    if (isOpen) {
+      setForm(initialForm);
+      setErrors({});
+      setSubmitError('');
+      setReviewMode(false);
+      setConfirmationOpen(false);
+      setRetreatConsentGiven(false);
+      setDone(false);
+    }
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  const closeAndReturnToHero = () => {
+    setConfirmationOpen(false);
+    onClose();
+
+    requestAnimationFrame(() => {
+      const hero = document.querySelector('#hero');
+      if (hero) hero.scrollIntoView({ behavior: 'smooth' });
+    });
+  };
 
   const set = (field, val) => setForm(f => {
     let nextValue = val;
@@ -149,6 +196,7 @@ export default function RegisterModal({ isOpen, onClose }) {
       e.other_church = 'Please specify your church';
     }
     if (!form.christian_duration) e.christian_duration = 'Required';
+    if (!form.payment_method) e.payment_method = 'Required';
     if (!form.emergency_contact_name.trim()) e.emergency_contact_name = 'Required';
     if (form.emergency_contact_name.trim() && !isValidName(form.emergency_contact_name)) {
       e.emergency_contact_name = 'Emergency contact name must contain letters and spaces only';
@@ -204,8 +252,15 @@ export default function RegisterModal({ isOpen, onClose }) {
   const openReview = () => {
     if (!validate()) return;
     setSubmitError('');
-    setReviewMode(true);
+    if (retreatConsentGiven) {
+      setReviewMode(true);
+      return;
+    }
+
+    setConfirmationOpen(true);
   };
+
+  const selectedPaymentOption = getPaymentOption(form.payment_method);
 
   return (
     <AnimatePresence>
@@ -221,7 +276,6 @@ export default function RegisterModal({ isOpen, onClose }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
             className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
           />
 
@@ -311,6 +365,10 @@ export default function RegisterModal({ isOpen, onClose }) {
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">How long have you been a Christian?</p>
                         <p className="text-white sm:text-right wrap-break-word">{form.christian_duration}</p>
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
+                        <p className="text-slate-400">Payment Method</p>
+                        <p className="text-white sm:text-right wrap-break-word">{form.payment_method}</p>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-1 sm:gap-4 px-4 py-3 text-sm">
                         <p className="text-slate-400">Emergency Contact</p>
@@ -426,6 +484,78 @@ export default function RegisterModal({ isOpen, onClose }) {
                       </div>
                     </div>
                   </div>
+
+                  <div>
+                    <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-3">Payment</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Preferred Payment Method</label>
+                        <select
+                          value={form.payment_method}
+                          onChange={(e) => set('payment_method', e.target.value)}
+                          className={`w-full bg-white/5 border rounded-xl px-4 py-2.5 text-white text-sm outline-none transition-all focus:ring-2 focus:ring-amber-400/40 ${
+                            errors.payment_method ? 'border-red-400/60' : 'border-white/10 focus:border-amber-400/50'
+                          }`}
+                        >
+                          <option value="" className="text-slate-900">Select payment method</option>
+                          {PAYMENT_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value} className="text-slate-900">
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.payment_method && <p className="text-red-400 text-xs mt-1">{errors.payment_method}</p>}
+                      </div>
+
+                      {selectedPaymentOption && (
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-white">
+                                {selectedPaymentOption.images?.length ? `${selectedPaymentOption.label} QR` : selectedPaymentOption.label}
+                              </p>
+                              {selectedPaymentOption.images?.length && (
+                                <p className="mt-1 text-xs leading-5 text-amber-200/90">
+                                  Reminder: make sure you have a proof of payment after sending your payment.
+                                </p>
+                              )}
+                              {!selectedPaymentOption.images?.length && (
+                                <p className="mt-1 text-xs leading-5 text-slate-400">
+                                  {selectedPaymentOption.note}
+                                </p>
+                              )}
+                            </div>
+                            {!selectedPaymentOption.images?.length && (
+                              <span className="rounded-full border border-amber-400/25 bg-amber-500/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-300">
+                                Info
+                              </span>
+                            )}
+                          </div>
+                          {selectedPaymentOption.images?.length ? (
+                            <div className={`mt-4 grid gap-4 ${selectedPaymentOption.images.length > 1 ? 'sm:grid-cols-2' : 'place-items-center'}`}>
+                              {selectedPaymentOption.images.map((image) => (
+                                <div key={image.src} className="flex justify-center">
+                                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white p-3 shadow-lg">
+                                    <img
+                                      src={image.src}
+                                      alt={image.alt}
+                                      width="220"
+                                      height="220"
+                                      className="h-auto w-55 rounded-xl"
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="mt-4 rounded-2xl border border-dashed border-white/12 bg-slate-950/35 px-4 py-4 text-sm leading-6 text-slate-300">
+                              Please prepare the exact registration fee and coordinate with the event team for cash payment handling.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -461,6 +591,51 @@ export default function RegisterModal({ isOpen, onClose }) {
                 </div>
               </div>
             )}
+
+            <AnimatePresence>
+              {confirmationOpen && !done && !reviewMode && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/72 px-4 backdrop-blur-sm"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.97, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900/96 p-6 text-center shadow-2xl"
+                  >
+                    <p className="text-amber-400 text-xs font-bold uppercase tracking-[0.24em]">Before You Continue</p>
+                    <h3 className="mt-3 text-xl font-black text-white">Retreat Stay Reminder</h3>
+                    <p className="mt-4 text-sm leading-6 text-slate-300">
+                      Are you willing to embrace a simple and memorable retreat experience, sharing a classroom space with fellow delegates (floor sleeping, non-air-conditioned)?
+                    </p>
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={closeAndReturnToHero}
+                        className="flex-1 rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition-all hover:border-white/35 hover:bg-white/5"
+                      >
+                        No, Go Back Home
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRetreatConsentGiven(true);
+                          setConfirmationOpen(false);
+                          setReviewMode(true);
+                        }}
+                        className="flex-1 rounded-full bg-amber-500 px-5 py-3 text-sm font-bold text-slate-900 transition-all hover:bg-amber-400"
+                      >
+                        Yes, Continue
+                      </button>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </motion.div>
       )}

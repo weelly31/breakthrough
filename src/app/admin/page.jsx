@@ -5,6 +5,28 @@ import Link from 'next/link';
 import { Download, Eye, EyeOff, RefreshCcw, Search, ShieldCheck, X } from 'lucide-react';
 import ExcelJS from 'exceljs';
 
+function getPaymentStatusMeta(status) {
+  const normalizedStatus = String(status || 'UNPAID').toUpperCase();
+
+  if (normalizedStatus === 'PAID') {
+    return {
+      label: 'Paid',
+      badgeClassName: 'border-emerald-400/30 bg-emerald-500/15 text-emerald-200',
+      buttonClassName: 'border border-white/20 hover:border-amber-300 text-white',
+      actionLabel: 'Mark Unpaid',
+      nextStatus: 'UNPAID',
+      showBadge: true,
+    };
+  }
+
+  return {
+    buttonClassName: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950',
+    actionLabel: 'Mark Paid',
+    nextStatus: 'PAID',
+    showBadge: false,
+  };
+}
+
 function getExcelColumns() {
   return [
     { header: 'Date Registered', key: 'created_at', width: 24 },
@@ -17,6 +39,8 @@ function getExcelColumns() {
     { header: 'Small Group Leader', key: 'small_group_leader', width: 26 },
     { header: 'Other Church', key: 'other_church', width: 30 },
     { header: 'Christian Duration', key: 'christian_duration', width: 22 },
+    { header: 'Payment Method', key: 'payment_method', width: 20 },
+    { header: 'Payment Status', key: 'payment_status', width: 18 },
     { header: 'Emergency Contact Name', key: 'emergency_contact_name', width: 26 },
     { header: 'Emergency Contact Number', key: 'emergency_contact_number', width: 24 },
     { header: 'Relationship', key: 'emergency_contact_relation', width: 16 },
@@ -36,10 +60,16 @@ export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
   const [sgLeaderFilter, setSgLeaderFilter] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [updatingPaymentId, setUpdatingPaymentId] = useState('');
 
   const formattedRecords = useMemo(
-    () => records.map((item) => ({ ...item, _createdDisplay: new Date(item.created_at).toLocaleString() })),
+    () => records.map((item) => ({
+      ...item,
+      _createdDisplay: new Date(item.created_at).toLocaleString(),
+      _paymentStatus: String(item.payment_status || 'UNPAID').toUpperCase(),
+    })),
     [records],
   );
 
@@ -75,6 +105,10 @@ export default function AdminPage() {
         return false;
       }
 
+      if (paymentStatusFilter !== 'all' && record._paymentStatus !== paymentStatusFilter) {
+        return false;
+      }
+
       if (!normalizedQuery) return true;
 
       const searchableText = [
@@ -86,6 +120,8 @@ export default function AdminPage() {
         record.small_group_leader,
         record.other_church,
         record.christian_duration,
+        record.payment_method,
+        record._paymentStatus,
         record.emergency_contact_name,
         record.emergency_contact_number,
       ]
@@ -94,7 +130,7 @@ export default function AdminPage() {
 
       return searchableText.includes(normalizedQuery);
     });
-  }, [formattedRecords, searchQuery, genderFilter, sgLeaderFilter]);
+  }, [formattedRecords, searchQuery, genderFilter, sgLeaderFilter, paymentStatusFilter]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(filteredRecords.length / PAGE_SIZE)),
@@ -108,7 +144,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [records, searchQuery, genderFilter, sgLeaderFilter]);
+  }, [records, searchQuery, genderFilter, sgLeaderFilter, paymentStatusFilter]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -152,6 +188,44 @@ export default function AdminPage() {
     setSearchQuery('');
     setGenderFilter('all');
     setSgLeaderFilter('');
+    setPaymentStatusFilter('all');
+  };
+
+  const updatePaymentStatus = async (recordId, nextStatus) => {
+    if (!token.trim() || !recordId) return;
+
+    setUpdatingPaymentId(recordId);
+    setError('');
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-register-read-token': token,
+        },
+        body: JSON.stringify({
+          id: recordId,
+          payment_status: nextStatus,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Failed to update payment status.');
+      }
+
+      setRecords((currentRecords) => currentRecords.map((record) => (
+        String(record._id) === String(recordId)
+          ? { ...record, ...payload.record }
+          : record
+      )));
+    } catch (err) {
+      setError(err?.message || 'Failed to update payment status.');
+    } finally {
+      setUpdatingPaymentId('');
+    }
   };
 
   const exportExcel = async () => {
@@ -190,6 +264,8 @@ export default function AdminPage() {
         small_group_leader: record.small_group_leader || '',
         other_church: record.other_church || '',
         christian_duration: record.christian_duration || '',
+        payment_method: record.payment_method || '',
+        payment_status: record._paymentStatus || 'UNPAID',
         emergency_contact_name: record.emergency_contact_name || '',
         emergency_contact_number: record.emergency_contact_number || '',
         emergency_contact_relation: record.emergency_contact_relation || '',
@@ -304,7 +380,7 @@ export default function AdminPage() {
           {!!records.length && (
             <div className="px-5 md:px-6 py-4 border-b border-white/10 bg-slate-900/50">
               <div className="grid lg:grid-cols-12 gap-3">
-                <div className="lg:col-span-6 flex gap-2">
+                <div className="lg:col-span-5 flex gap-2">
                   <input
                     type="text"
                     value={searchInput}
@@ -312,7 +388,7 @@ export default function AdminPage() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSearch();
                     }}
-                    placeholder="Search name, phone, church, SG leader, emergency contact..."
+                    placeholder="Search name, phone, church, SG leader, payment, emergency contact..."
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-amber-400"
                   />
                   <button
@@ -323,7 +399,7 @@ export default function AdminPage() {
                   </button>
                 </div>
 
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                   <select
                     value={genderFilter}
                     onChange={(e) => setGenderFilter(e.target.value)}
@@ -335,6 +411,18 @@ export default function AdminPage() {
                         {gender}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                <div className="lg:col-span-2">
+                  <select
+                    value={paymentStatusFilter}
+                    onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
+                  >
+                    <option value="all" className="text-slate-900">All Payments</option>
+                    <option value="PAID" className="text-slate-900">Paid</option>
+                    <option value="UNPAID" className="text-slate-900">Unpaid</option>
                   </select>
                 </div>
 
@@ -389,29 +477,53 @@ export default function AdminPage() {
                       <th className="text-left px-4 py-3">Gender</th>
                       <th className="text-left px-4 py-3">SG Leader</th>
                       <th className="text-left px-4 py-3">Christian Duration</th>
+                      <th className="text-left px-4 py-3">Payment Method</th>
+                      <th className="text-left px-4 py-3">Payment Status</th>
                       <th className="text-left px-4 py-3">Emergency Contact</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedRecords.map((record) => (
-                      <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors">
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
-                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.first_name}</td>
-                        <td className="px-4 py-3 text-white whitespace-nowrap">{record.last_name}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.preferred_name || '-'}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
-                          {record.small_group_leader}
-                          {record.small_group_leader === 'FROM OTHER CHURCH' && record.other_church ? ` (${record.other_church})` : ''}
-                        </td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.christian_duration || '-'}</td>
-                        <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
-                          {record.emergency_contact_name} ({record.emergency_contact_relation}) - {record.emergency_contact_number}
-                        </td>
-                      </tr>
-                    ))}
+                    {paginatedRecords.map((record) => {
+                      const paymentStatusMeta = getPaymentStatusMeta(record._paymentStatus);
+
+                      return (
+                        <tr key={record._id} className="border-t border-white/10 hover:bg-white/5 transition-colors align-top">
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record._createdDisplay}</td>
+                          <td className="px-4 py-3 text-white whitespace-nowrap">{record.first_name}</td>
+                          <td className="px-4 py-3 text-white whitespace-nowrap">{record.last_name}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.preferred_name || '-'}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.phone}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.age}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.gender}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                            {record.small_group_leader}
+                            {record.small_group_leader === 'FROM OTHER CHURCH' && record.other_church ? ` (${record.other_church})` : ''}
+                          </td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.christian_duration || '-'}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{record.payment_method || '-'}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {paymentStatusMeta.showBadge && (
+                                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] ${paymentStatusMeta.badgeClassName}`}>
+                                  {paymentStatusMeta.label}
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => updatePaymentStatus(record._id, paymentStatusMeta.nextStatus)}
+                                disabled={updatingPaymentId === String(record._id)}
+                                className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed ${paymentStatusMeta.buttonClassName}`}
+                              >
+                                {updatingPaymentId === String(record._id) ? 'Updating...' : paymentStatusMeta.actionLabel}
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                            {record.emergency_contact_name} ({record.emergency_contact_relation}) - {record.emergency_contact_number}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
