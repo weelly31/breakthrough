@@ -85,7 +85,7 @@ function normalizePhilippineMobile(value) {
 }
 
 function isValidName(value) {
-  return /^[A-Za-z\s]+$/.test(String(value ?? '').trim());
+  return /^[A-Za-zÑñ\s]+$/.test(String(value ?? '').trim());
 }
 
 function Field({ label, name, type = 'text', placeholder, value, onChange, error, inputMode, pattern }) {

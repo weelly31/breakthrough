@@ -50,7 +50,7 @@ function normalizePhilippineMobile(value) {
 }
 
 function isValidName(value) {
-  return /^[A-Za-z\s]+$/.test(String(value ?? '').trim());
+  return /^[A-Za-zÑñ\s]+$/.test(String(value ?? '').trim());
 }
 
 function toUpperTrimmed(value) {
