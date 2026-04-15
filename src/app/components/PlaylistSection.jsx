@@ -109,7 +109,7 @@ export default function PlaylistSection() {
           </a>
         </motion.div>
 
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -126,7 +126,7 @@ export default function PlaylistSection() {
               allowFullScreen
             />
           </div>
-        </motion.div>
+        </motion.div> */}
 
         <div className="mb-6 px-1 text-center text-sm font-medium text-slate-500 sm:text-left">
           All Shared Videos (11)
