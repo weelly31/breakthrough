@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import ActivitiesSection from './components/ActivitiesSection';
+import PlaylistSection from './components/PlaylistSection';
 import GallerySection from './components/GallerySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
@@ -39,6 +40,7 @@ export default function Home() {
       <HeroSection heroImage={IMAGES.hero} onRegister={() => setRegisterOpen(true)} />
       <AboutSection aboutImage={IMAGES.about} />
       <ActivitiesSection images={IMAGES.activities} />
+      <PlaylistSection />
       <GallerySection galleryImages={IMAGES.gallery} />
       <ContactSection onRegister={() => setRegisterOpen(true)} />
       <Footer onRegister={() => setRegisterOpen(true)} />
