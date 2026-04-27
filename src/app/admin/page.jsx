@@ -233,16 +233,62 @@ export default function AdminPage() {
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Registrations', {
-      views: [{ state: 'frozen', ySplit: 1 }],
+      views: [{ state: 'frozen', ySplit: 5 }],
     });
 
     worksheet.columns = getExcelColumns();
+    worksheet.spliceRows(1, 0, [], [], [], []);
+
+    const tableHeaderRowNumber = 5;
+    const firstColumn = 'A';
+    const lastColumn = worksheet.getColumn(worksheet.columns.length).letter;
+    const titleRange = `${firstColumn}1:${lastColumn}1`;
+    const subtitleRange = `${firstColumn}2:${lastColumn}2`;
+    const listLabelRange = `${firstColumn}3:${lastColumn}3`;
+
+    worksheet.mergeCells(titleRange);
+    worksheet.mergeCells(subtitleRange);
+    worksheet.mergeCells(listLabelRange);
+
+    worksheet.getCell(`${firstColumn}1`).value = 'SUMMER RETREAT 2026';
+    worksheet.getCell(`${firstColumn}2`).value = 'THE LIVING SAVIOUR CHRISTIAN FELLOWSHIP';
+    worksheet.getCell(`${firstColumn}3`).value = `List of Registered Participants (${filteredRecords.length})`;
+
+    worksheet.getRow(1).height = 28;
+    worksheet.getRow(2).height = 22;
+    worksheet.getRow(3).height = 20;
+    worksheet.getRow(4).height = 8;
+
+    worksheet.getCell(`${firstColumn}1`).font = {
+      bold: true,
+      size: 16,
+      color: { argb: 'FF111827' },
+      name: 'Calibri',
+    };
+    worksheet.getCell(`${firstColumn}1`).alignment = { vertical: 'middle', horizontal: 'center' };
+
+    worksheet.getCell(`${firstColumn}2`).font = {
+      bold: true,
+      size: 12,
+      color: { argb: 'FF1F2937' },
+      name: 'Calibri',
+    };
+    worksheet.getCell(`${firstColumn}2`).alignment = { vertical: 'middle', horizontal: 'center' };
+
+    worksheet.getCell(`${firstColumn}3`).font = {
+      bold: true,
+      size: 11,
+      color: { argb: 'FF374151' },
+      name: 'Calibri',
+    };
+    worksheet.getCell(`${firstColumn}3`).alignment = { vertical: 'middle', horizontal: 'center' };
+
     worksheet.autoFilter = {
-      from: { row: 1, column: 1 },
-      to: { row: 1, column: worksheet.columns.length },
+      from: { row: tableHeaderRowNumber, column: 1 },
+      to: { row: tableHeaderRowNumber, column: worksheet.columns.length },
     };
 
-    const headerRow = worksheet.getRow(1);
+    const headerRow = worksheet.getRow(tableHeaderRowNumber);
     headerRow.height = 24;
     headerRow.font = { bold: true, color: { argb: 'FF1F2937' } };
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -280,13 +326,13 @@ export default function AdminPage() {
           bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } },
           right: { style: 'thin', color: { argb: 'FFD1D5DB' } },
         };
-        if (rowNumber > 1) {
+        if (rowNumber > tableHeaderRowNumber) {
           cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
           cell.font = { color: { argb: 'FF111827' } };
         }
       });
 
-      if (rowNumber > 1) {
+      if (rowNumber > tableHeaderRowNumber) {
         row.fill = {
           type: 'pattern',
           pattern: 'solid',
